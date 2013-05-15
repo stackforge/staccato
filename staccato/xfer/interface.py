@@ -3,7 +3,6 @@ import urlparse
 from staccato.common import utils, config
 from staccato import db
 from staccato.xfer.constants import Events
-from staccato.xfer import events
 
 
 def xfer_new(CONF, srcurl, dsturl, src_opts, dst_opts, start_ndx=0,
@@ -35,28 +34,28 @@ def xfer_new(CONF, srcurl, dsturl, src_opts, dst_opts, start_ndx=0,
     return xfer
 
 
-def xfer_start(conf, xfer_id):
+def xfer_start(conf, xfer_id, state_machine):
     db_con = db.StaccatoDB(conf)
     request = db_con.lookup_xfer_request_by_id(xfer_id)
-    events.g_my_states.event_occurred(Events.EVENT_START,
+    state_machine.event_occurred(Events.EVENT_START,
                                       conf=conf,
                                       xfer_request=request,
                                       db=db_con)
 
 
-def xfer_cancel(conf, xfer_id):
+def xfer_cancel(conf, xfer_id, state_machine):
     db_con = db.StaccatoDB(conf)
     request = db_con.lookup_xfer_request_by_id(xfer_id)
-    events.g_my_states.event_occurred(Events.EVENT_CANCEL,
+    state_machine.event_occurred(Events.EVENT_CANCEL,
                                       conf=conf,
                                       xfer_request=request,
                                       db=db_con)
 
 
-def xfer_delete(conf, xfer_id):
+def xfer_delete(conf, xfer_id, state_machine):
     db_con = db.StaccatoDB(conf)
     request = db_con.lookup_xfer_request_by_id(xfer_id)
-    events.g_my_states.event_occurred(Events.EVENT_DELETE,
+    state_machine.event_occurred(Events.EVENT_DELETE,
                                       conf=conf,
                                       xfer_request=request,
                                       db=db_con)

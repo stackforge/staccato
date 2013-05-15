@@ -49,14 +49,28 @@ def do_transfer(CONF, xfer_id, state_machine):
                                    db=db_con)
 
 
-class SimpleThreadExecutor(threading.Thread):
+class SimpleThreadExecutor(object):
 
-    def __init__(self, xfer_id, conf, state_machine):
-        super(SimpleThreadExecutor, self).__init__()
+    def __init__(self, conf):
         self.conf = conf
-        self.xfer_id = xfer_id
-        self.state_machine = state_machine
-        self.start()
+        self.threads = []
 
-    def run(self):
-        do_transfer(self.conf, self.xfer_id, self.state_machine)
+    def execute(self, xfer_id, state_machine):
+        thread = threading.Thread(target=self, args=(xfer_id, state_machine))
+        thread.daemon = True
+        self.threads.append(thread)
+        thread.start()
+
+    def __call__(self, xfer_id, state_machine):
+        do_transfer(self.conf, xfer_id, state_machine)
+
+    def cleanup(self):
+        for t in self.threads[:]:
+            if not t.is_alive():
+                t.join()
+                self.threads.pop(t)
+
+    def shutdown(self):
+        for t in self.threads:
+            t.join()
+        self.threads = []

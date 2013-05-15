@@ -1,12 +1,14 @@
 import filecmp
 import time
 
+import staccato.xfer.events as xfer_events
 import staccato.xfer.interface as xfer_iface
 import staccato.xfer.constants as xfer_consts
 import staccato.db as db
 import staccato.xfer.constants as constants
 from staccato.common import config
 from staccato.tests import utils
+import staccato.xfer.executor as executor
 
 
 class FakeStateMachine(object):
@@ -30,6 +32,12 @@ class TestXfer(utils.TempFileCleanupBaseTest):
         self.conf = config.get_config_object(
             args=[],
             default_config_files=[self.conf_file])
+        self.executor = executor.SimpleThreadExecutor(self.conf)
+        self.sm = xfer_events.XferStateMachine(self.executor)
+
+    def tearDown(self):
+        self.executor.shutdown()
+        super(TestXfer, self).tearDown()
 
     def test_file_xfer_basic(self):
         dst_file = self.get_tempfile()
@@ -39,15 +47,15 @@ class TestXfer(utils.TempFileCleanupBaseTest):
 
         xfer = xfer_iface.xfer_new(self.conf, src_url, dst_url,
                                    {}, {}, 0, None)
-        xfer_iface.xfer_start(self.conf, xfer.id)
+        xfer_iface.xfer_start(self.conf, xfer.id, self.sm)
 
         db_obj = db.StaccatoDB(self.conf)
         while not xfer_consts.is_state_done_running(xfer.state):
-            time.sleep(0.01)
+            time.sleep(0.1)
             xfer = db_obj.lookup_xfer_request_by_id(xfer.id)
 
         self.assertTrue(filecmp.cmp(dst_file, src_file))
-        self.assertTrue(xfer.state, constants.States.STATE_COMPLETE)
+        self.assertEqual(xfer.state, constants.States.STATE_COMPLETE)
 
     def test_file_xfer_cancel(self):
         dst_file = self.get_tempfile()
@@ -57,12 +65,12 @@ class TestXfer(utils.TempFileCleanupBaseTest):
 
         xfer = xfer_iface.xfer_new(self.conf, src_url, dst_url,
                                    {}, {}, 0, None)
-        xfer_iface.xfer_start(self.conf, xfer.id)
-        xfer_iface.xfer_cancel(self.conf, xfer.id)
+        xfer_iface.xfer_start(self.conf, xfer.id, self.sm)
+        xfer_iface.xfer_cancel(self.conf, xfer.id, self.sm)
 
         db_obj = db.StaccatoDB(self.conf)
         while not xfer_consts.is_state_done_running(xfer.state):
-            time.sleep(0.01)
+            time.sleep(0.1)
             xfer = db_obj.lookup_xfer_request_by_id(xfer.id)
 
         self.assertTrue(xfer.state, constants.States.STATE_CANCELED)
