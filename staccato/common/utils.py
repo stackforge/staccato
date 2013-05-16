@@ -1,6 +1,8 @@
 import logging
-from paste import deploy
 import re
+
+from paste import deploy
+
 from staccato.common import exceptions
 from staccato.openstack.common import importutils
 

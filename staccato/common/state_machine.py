@@ -34,11 +34,11 @@ class StateMachine(object):
 
         current_state = self._get_current_state(**kwvals)
         if current_state not in self._transitions:
-            raise exceptions.StaccatoParameterError(
+            raise exceptions.StaccatoInvalidStateTransitionException(
                 "Undefined event %s at state %s" % (event, current_state))
         state_ent = self._transitions[current_state]
         if event not in state_ent:
-            raise exceptions.StaccatoParameterError(
+            raise exceptions.StaccatoInvalidStateTransitionException(
                 "Undefined event %s at state %s" % (event, current_state))
 
         next_state, function = state_ent[event]

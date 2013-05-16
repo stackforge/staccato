@@ -32,9 +32,3 @@ class XferApp(object):
                                   content_type='application/json')
         response.body = json.dumps(dict(versions=version_objs))
         return response
-
-
-def create_resource(conf):
-    # TODO: figure out what this has to be this way
-    config_obj = conf['CONF']['conf']
-    return XferApp(conf=config_obj)

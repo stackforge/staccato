@@ -2,8 +2,6 @@ import httplib
 import json
 import webob
 
-from staccato.common import wsgi
-
 
 class VersionApp(object):
     """
@@ -12,10 +10,10 @@ class VersionApp(object):
     def __init__(self, conf):
         self.conf = conf
 
-    @webob.dec.wsgify(RequestClass=wsgi.Request)
+    @webob.dec.wsgify
     def __call__(self, req):
         version_info = {
-                'id': self.conf.id,
+                'id': self.conf.service_id,
                 'version': self.conf.version,
                 'status': 'active'
             }
@@ -26,9 +24,3 @@ class VersionApp(object):
                                   content_type='application/json')
         response.body = json.dumps(dict(versions=version_objs))
         return response
-
-
-def create_resource(conf):
-    # TODO: figure out what this has to be this way
-    config_obj = conf['CONF']['conf']
-    return VersionApp(conf=config_obj)

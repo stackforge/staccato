@@ -1,9 +1,20 @@
-import logging
-from oslo.config import cfg
 import json
+import logging
+
+from oslo.config import cfg
 
 from staccato.version import version_info as version
 
+paste_deploy_opts = [
+    cfg.StrOpt('flavor',
+               help=_('Partial name of a pipeline in your paste configuration '
+                      'file with the service name removed. For example, if '
+                      'your paste section name is '
+                      '[pipeline:glance-api-keystone] use the value '
+                      '"keystone"')),
+    cfg.StrOpt('config_file',
+               help=_('Name of the paste configuration file.')),
+]
 common_opts = [
     cfg.ListOpt('protocol_plugins',
                 default=['staccato.protocols.file.FileProtocol',
@@ -36,6 +47,15 @@ common_opts = [
                dest='str_log_level'),
     cfg.StrOpt('protocol_policy', default='staccato-protocols.json',
                help=''),
+    cfg.StrOpt('service_id', default='staccato1234',
+               help=''),
+]
+bind_opts = [
+    cfg.StrOpt('bind_host', default='0.0.0.0',
+               help=_('Address to bind the server.  Useful when '
+                      'selecting a particular network interface.')),
+    cfg.IntOpt('bind_port',
+               help=_('The port on which the server will listen.')),
 ]
 
 
@@ -55,6 +75,8 @@ def _log_string_to_val(conf):
 def get_config_object(args=None, usage=None, default_config_files=None):
     conf = cfg.ConfigOpts()
     conf.register_opts(common_opts)
+    conf.register_opts(bind_opts)
+    conf.register_opts(paste_deploy_opts, group='paste_deploy')
     conf(args=args,
          project='staccato',
          version=version.cached_version_string(),

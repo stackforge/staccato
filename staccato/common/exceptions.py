@@ -34,3 +34,7 @@ class StaccatoDataBaseException(StaccatoBaseException):
 
 class StaccatoEventException(StaccatoBaseException):
     pass
+
+
+class StaccatoInvalidStateTransitionException(StaccatoEventException):
+    pass
