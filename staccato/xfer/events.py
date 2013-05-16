@@ -37,20 +37,6 @@ class XferStateMachine(state_machine.StateMachine):
         This handler just allows for the DB change.
         """
 
-    def state_starting_handler(
-            self,
-            current_state,
-            event,
-            new_state,
-            conf,
-            db,
-            xfer_request,
-            **kwvals):
-        self.event_occurred(constants.Events.EVENT_STARTED,
-                                   conf=conf,
-                                   xfer_request=xfer_request,
-                                   db=db)
-
     def state_running_handler(
             self,
             current_state,
@@ -77,8 +63,6 @@ class XferStateMachine(state_machine.StateMachine):
     def map_states(self):
         self.set_state_func(constants.States.STATE_NEW,
                                    self.state_noop_handler)
-        self.set_state_func(constants.States.STATE_STARTING,
-                                   self.state_starting_handler)
         self.set_state_func(constants.States.STATE_RUNNING,
                                    self.state_running_handler)
         self.set_state_func(constants.States.STATE_CANCELING,
@@ -97,27 +81,18 @@ class XferStateMachine(state_machine.StateMachine):
         # setup the state machine
         self.set_mapping(constants.States.STATE_NEW,
                                 constants.Events.EVENT_START,
-                                constants.States.STATE_STARTING)
+                                constants.States.STATE_RUNNING)
         self.set_mapping(constants.States.STATE_NEW,
                                 constants.Events.EVENT_CANCEL,
                                 constants.States.STATE_CANCELED)
-        self.set_mapping(constants.States.STATE_NEW,
-                                constants.Events.EVENT_START,
-                                constants.States.STATE_STARTING)
 
         self.set_mapping(constants.States.STATE_CANCELED,
                                 constants.Events.EVENT_DELETE,
                                 constants.States.STATE_DELETED)
 
-        self.set_mapping(constants.States.STATE_STARTING,
-                                constants.Events.EVENT_STARTED,
-                                constants.States.STATE_RUNNING)
-        self.set_mapping(constants.States.STATE_STARTING,
-                                constants.Events.EVENT_CANCEL,
-                                constants.States.STATE_CANCELING)
-        self.set_mapping(constants.States.STATE_STARTING,
-                                constants.Events.EVENT_ERROR,
-                                constants.States.STATE_ERRORING)
+        self.set_mapping(constants.States.STATE_CANCELING,
+                                constants.Events.EVENT_COMPLETE,
+                                constants.States.STATE_COMPLETE)
 
         self.set_mapping(constants.States.STATE_RUNNING,
                                 constants.Events.EVENT_COMPLETE,
@@ -139,7 +114,7 @@ class XferStateMachine(state_machine.StateMachine):
 
         self.set_mapping(constants.States.STATE_ERROR,
                                 constants.Events.EVENT_START,
-                                constants.States.STATE_STARTING)
+                                constants.States.STATE_RUNNING)
 
 
 

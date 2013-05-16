@@ -1,4 +1,5 @@
 import datetime
+import time
 
 import staccato.xfer.constants as constants
 import staccato.common.exceptions as exceptions
@@ -70,7 +71,7 @@ class XferReadMonitor(XferDBUpdater):
 
     def is_done(self):
         self._check_db_ready()
-        return constants.is_state_done_running(self.request.state)
+        return self.request.state != constants.States.STATE_RUNNING
 
 
 class XferCheckpointer(XferDBUpdater):
@@ -109,6 +110,7 @@ class XferCheckpointer(XferDBUpdater):
         else:
             self.blocks[block_start] = block_end
 
+        time.sleep(0.1)
         self.blocks = _merge_one(self.blocks)
 
     def _do_db_operation(self):

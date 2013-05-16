@@ -58,17 +58,17 @@ class TestXfer(utils.TempFileCleanupBaseTest):
         self.assertEqual(xfer.state, constants.States.STATE_COMPLETE)
 
     def test_file_xfer_cancel(self):
-        dst_file = self.get_tempfile()
+        dst_file = "/dev/null"
         src_file = "/dev/zero"
         src_url = "file://%s" % src_file
         dst_url = "file://%s" % dst_file
 
         xfer = xfer_iface.xfer_new(self.conf, src_url, dst_url,
                                    {}, {}, 0, None)
+        db_obj = db.StaccatoDB(self.conf)
         xfer_iface.xfer_start(self.conf, xfer.id, self.sm)
         xfer_iface.xfer_cancel(self.conf, xfer.id, self.sm)
 
-        db_obj = db.StaccatoDB(self.conf)
         while not xfer_consts.is_state_done_running(xfer.state):
             time.sleep(0.1)
             xfer = db_obj.lookup_xfer_request_by_id(xfer.id)
