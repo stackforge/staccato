@@ -4,8 +4,8 @@ import json
 import webob.dec
 import webob.exc
 
-from staccato.common import wsgi
-
+import staccato.openstack.common.wsgi as os_wsgi
+import staccato.db as db
 
 class XferApp(object):
     """
@@ -13,12 +13,9 @@ class XferApp(object):
     """
     def __init__(self, conf):
         self.conf = conf
+        self.db = db.StaccatoDB(self.conf)
 
-    def xfer(self, req):
-        required_params = ['srcurl', 'dsturl']
-        optional_params = []
-
-    @webob.dec.wsgify(RequestClass=wsgi.Request)
+    @webob.dec.wsgify(RequestClass=os_wsgi.Request)
     def __call__(self, req):
         version_info = {
                 'id': self.conf.id,
@@ -32,3 +29,5 @@ class XferApp(object):
                                   content_type='application/json')
         response.body = json.dumps(dict(versions=version_objs))
         return response
+
+

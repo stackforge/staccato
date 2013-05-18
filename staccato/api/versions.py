@@ -2,6 +2,8 @@ import httplib
 import json
 import webob
 
+import staccato.openstack.common.wsgi as os_wsgi
+
 
 class VersionApp(object):
     """
@@ -10,7 +12,7 @@ class VersionApp(object):
     def __init__(self, conf):
         self.conf = conf
 
-    @webob.dec.wsgify
+    @webob.dec.wsgify(RequestClass=os_wsgi.Request)
     def __call__(self, req):
         version_info = {
                 'id': self.conf.service_id,

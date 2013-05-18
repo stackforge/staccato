@@ -100,9 +100,6 @@ class StaccatoDB(object):
 
 
 def _get_db_object(CONF):
-    sa_logger = logging.getLogger('sqlalchemy.engine')
-    sa_logger.setLevel(CONF.log_level)
-
     sqlalchemy.engine.url.make_url(CONF.sql_connection)
     engine_args = {
         'pool_recycle': CONF.sql_idle_timeout,

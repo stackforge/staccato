@@ -10,7 +10,7 @@ paste_deploy_opts = [
                help=_('Partial name of a pipeline in your paste configuration '
                       'file with the service name removed. For example, if '
                       'your paste section name is '
-                      '[pipeline:glance-api-keystone] use the value '
+                      '[pipeline:staccato-api-keystone] use the value '
                       '"keystone"')),
     cfg.StrOpt('config_file',
                help=_('Name of the paste configuration file.')),

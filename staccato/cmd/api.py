@@ -23,7 +23,9 @@ def main():
         #config.parse_args(sys.argv)
         conf = config.get_config_object()
         paste_file = conf.paste_deploy.config_file
-        wsgi_app = os_pastedeploy.paste_deploy_app(paste_file, 'staccato-api', conf)
+        wsgi_app = os_pastedeploy.paste_deploy_app(paste_file,
+                                                   'staccato-api',
+                                                   conf)
         server = os_wsgi.Service(wsgi_app, conf.bind_port)
         server.start()
         server.wait()

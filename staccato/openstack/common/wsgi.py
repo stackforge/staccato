@@ -382,7 +382,7 @@ class Resource(object):
         try:
             return self.serialize_response(action, action_result, accept)
         # return unserializable result (typically a webob exc)
-        except Exception:
+        except Exception, ex:
             return action_result
 
     def deserialize_request(self, request):
