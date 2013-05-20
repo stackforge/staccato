@@ -58,8 +58,6 @@ class HttpReadConnection(base.BaseReadConnection):
         self.monitor = monitor
 
     def _read(self, buflen):
-        if self.end and self.pos + buflen > self.end:
-            buflen = self.end - self.pos
         buf = self.h_con.read(buflen)
         if not buf:
             return True, 0
