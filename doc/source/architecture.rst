@@ -5,6 +5,11 @@ Stacatto Architecture
 This document describes the basic internal architecture of the Staccato 
 system.
 
+
+.. image:: staccato_internal_architecture.png
+      :width: 738
+      :height: 499
+
 REST API
 --------
 
