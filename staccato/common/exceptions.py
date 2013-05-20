@@ -38,3 +38,11 @@ class StaccatoEventException(StaccatoBaseException):
 
 class StaccatoInvalidStateTransitionException(StaccatoEventException):
     pass
+
+
+class StaccatoDatabaseException(StaccatoBaseException):
+    pass
+
+
+class StaccatoNotFoundInDBException(StaccatoDataBaseException):
+    pass

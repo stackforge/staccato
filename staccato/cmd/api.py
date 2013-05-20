@@ -1,7 +1,6 @@
 import eventlet
 import gettext
 import sys
-import time
 
 from staccato.common import config
 import staccato.openstack.common.wsgi as os_wsgi
@@ -20,7 +19,6 @@ def fail(returncode, e):
 
 def main():
     try:
-        #config.parse_args(sys.argv)
         conf = config.get_config_object()
         paste_file = conf.paste_deploy.config_file
         wsgi_app = os_pastedeploy.paste_deploy_app(paste_file,
@@ -31,6 +29,5 @@ def main():
         server.wait()
     except RuntimeError as e:
         fail(1, e)
-
 
 main()

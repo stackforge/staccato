@@ -1,8 +1,8 @@
-import logging
 import time
 
 import sqlalchemy
 import sqlalchemy.orm as sa_orm
+import sqlalchemy.orm.exc as orm_exc
 import sqlalchemy.sql.expression as sql_expression
 
 from staccato.db import migration, models
@@ -28,6 +28,7 @@ class StaccatoDB(object):
         return self.maker()
 
     def get_new_xfer(self,
+                     owner,
                      srcurl,
                      dsturl,
                      src_module_name,
@@ -43,6 +44,7 @@ class StaccatoDB(object):
 
         with session.begin():
             xfer_request = models.XferRequest()
+            xfer_request.owner = owner
             xfer_request.srcurl = srcurl
             xfer_request.dsturl = dsturl
             xfer_request.src_module_name = src_module_name
@@ -65,28 +67,91 @@ class StaccatoDB(object):
             session.add(db_obj)
             session.flush()
 
-    def lookup_xfer_request_by_id(self, xfer_id, session=None):
+    def lookup_xfer_request_by_id(self, xfer_id, owner=None, session=None):
+        try:
+            if session is None:
+                session = self.get_sessions()
+
+            with session.begin():
+                query = session.query(models.XferRequest)
+                if owner is not None:
+                    query = query.filter(sql_expression.and_(
+                                models.XferRequest.owner == owner,
+                                models.XferRequest.id == xfer_id))
+                else:
+                    query = query.filter(models.XferRequest.id == xfer_id)
+                xfer_request = query.one()
+            return xfer_request
+        except orm_exc.NoResultFound, nf_ex:
+            raise exceptions.StaccatoNotFoundInDBException(nf_ex)
+        except Exception, ex:
+            raise exceptions.StaccatoDataBaseException(ex)
+
+    def lookup_xfer_request_all(self, owner=None, session=None):
+        try:
+            if session is None:
+                session = self.get_sessions()
+
+            with session.begin():
+                query = session.query(models.XferRequest)
+                if owner is not None:
+                    query = query.filter(models.XferRequest.owner == owner)
+                xfer_requests = query.all()
+            return xfer_requests
+        except orm_exc.NoResultFound, nf_ex:
+            raise exceptions.StaccatoNotFoundInDBException(nf_ex)
+        except Exception, ex:
+            raise exceptions.StaccatoDataBaseException(ex)
+
+    def get_all_ready(self, owner=None, limit=None, session=None):
         if session is None:
             session = self.get_sessions()
 
         with session.begin():
-            query = session.query(models.XferRequest)\
-                       .filter(models.XferRequest.id == xfer_id)
-            xfer_request = query.one()
+            query = session.query(models.XferRequest)
+            if owner is not None:
+                query = query.filter(sql_expression.and_(
+                    models.XferRequest.owner == owner,
+                    sql_expression.or_(
+                        models.XferRequest.state == constants.States.STATE_NEW,
+                        models.XferRequest.state == constants.States.STATE_ERROR)))
+            else:
+                query = query.filter(sql_expression.or_(
+                    models.XferRequest.state == constants.States.STATE_NEW,
+                    models.XferRequest.state == constants.States.STATE_ERROR))
 
-        return xfer_request
-
-    def get_all_ready(self, limit=None, session=None):
-        if session is None:
-            session = self.get_sessions()
-
-        with session.begin():
-            query = session.query(models.XferRequest)\
-                       .filter(
-                sql_expression.or_(models.XferRequest.state == constants.State.STATE_NEW,
-                                   models.XferRequest.state == constants.State.STATE_ERROR))
             if limit is not None:
                 query = query.limit(limit)
+            xfer_requests = query.all()
+        return xfer_requests
+
+    def get_all_running(self, owner=None, limit=None, session=None):
+        if session is None:
+            session = self.get_sessions()
+
+        with session.begin():
+            query = session.query(models.XferRequest)
+            if owner is not None:
+                query = query.filter(sql_expression.and_(
+                    models.XferRequest.owner == owner,
+                    models.XferRequest.state == constants.States.STATE_RUNNING))
+            if limit is not None:
+                query = query.limit(limit)
+            xfer_requests = query.all()
+        return xfer_requests
+
+    def get_xfer_requests(self, ids, owner=None, session=None):
+        if session is None:
+            session = self.get_sessions()
+
+        with session.begin():
+            query = session.query(models.XferRequest)
+            if owner is not None:
+                query = query.filter(
+                    sql_expression.and_(models.XferRequest.owner == owner,
+                    models.XferRequest.id.in_(ids)))
+            else:
+                query = query.filter(models.XferRequest.id.in_(ids))
             xfer_requests = query.all()
         return xfer_requests
 

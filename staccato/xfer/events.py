@@ -29,20 +29,19 @@ class XferStateMachine(state_machine.StateMachine):
             current_state,
             event,
             new_state,
-            conf,
             db,
             xfer_request,
             **kwvals):
         """
         This handler just allows for the DB change.
         """
+        pass
 
     def state_running_handler(
             self,
             current_state,
             event,
             new_state,
-            conf,
             db,
             xfer_request,
             **kwvals):
@@ -54,7 +53,6 @@ class XferStateMachine(state_machine.StateMachine):
             current_state,
             event,
             new_state,
-            conf,
             db,
             xfer_request,
             **kwvals):
@@ -85,6 +83,9 @@ class XferStateMachine(state_machine.StateMachine):
         self.set_mapping(constants.States.STATE_NEW,
                                 constants.Events.EVENT_CANCEL,
                                 constants.States.STATE_CANCELED)
+        self.set_mapping(constants.States.STATE_NEW,
+                                constants.Events.EVENT_DELETE,
+                                constants.States.STATE_DELETED)
 
         self.set_mapping(constants.States.STATE_CANCELED,
                                 constants.Events.EVENT_DELETE,

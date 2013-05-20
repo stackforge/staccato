@@ -34,6 +34,7 @@ class XferRequest(BASE, ModelBase):
     id = Column(String(36), primary_key=True, default=uuidutils.generate_uuid)
     srcurl = Column(String(2048), nullable=False)
     dsturl = Column(String(2048), nullable=False)
+    owner = Column(String(128), nullable=False)
     src_module_name = Column(String(512), nullable=False)
     dst_module_name = Column(String(512), nullable=False)
     state = Column(Integer(), nullable=False)

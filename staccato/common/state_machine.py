@@ -7,9 +7,15 @@ class StateMachine(object):
         # set up the transition table
         self._transitions = {}
         self._state_funcs = {}
+        self._state_observer_funcs = {}
 
     def set_state_func(self, state, func):
         self._state_funcs[state] = func
+
+    def set_state_observer(self, state, func):
+        if state not in self._state_observer_funcs:
+            self._state_observer_funcs[state] = []
+        self._state_observer_funcs[state].append(func)
 
     def set_mapping(self, state, event, next_state, func=None):
         if state not in self._transitions:
@@ -44,6 +50,12 @@ class StateMachine(object):
         next_state, function = state_ent[event]
 
         self._state_changed(current_state, event, next_state, **kwvals)
+        # call all observors.  They are not allowed to effect state change
+        for f in self._state_observer_funcs:
+            try:
+                f(current_state, event, next_state, **kwvals)
+            except Exception, ex:
+                raise
         # log the change
         if function:
             try:
