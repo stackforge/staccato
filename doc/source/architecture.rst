@@ -79,6 +79,6 @@ The following diagrams show how the plugin will work in some common cases:
       :width: 529
       :height: 397
 
-.. image:: staccato_plugin_2_party.png
+.. image:: staccato_plugin_3rd_party.png
       :width: 529
       :height: 397
