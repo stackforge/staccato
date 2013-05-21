@@ -71,3 +71,14 @@ nova-compute does an boot of an instance it downloads an image from
 Glance. When using Staccato the source protocol module would be a 
 *Glance* plugin and the destination protocol module would be a *file 
 system* plugin.
+
+The following diagrams show how the plugin will work in some common cases:
+
+
+.. image:: staccato_plugin_2_party.png
+      :width: 529
+      :height: 397
+
+.. image:: staccato_plugin_2_party.png
+      :width: 529
+      :height: 397
