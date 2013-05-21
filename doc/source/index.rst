@@ -17,13 +17,13 @@ to another.  Below are a few of the tasks needed to accomplish that job:
 * Verify data integrity and security of the bytes in flight.
 
 Staccato is as a service that does a upload or download of an image on 
-behalf of a client.  The client can issue a single, short lived request
-to move an image.  Unlike traditional upload/downloads the client does
-not have to live for the length of the transfer marshaling the protocol
-de jour for every single byte.  Instead if issues it request, ends, and
-can then check back later for progress.  Staccato does the work of 
-protocol negotiation and optimal parameter setting, scheduling the 
-transfer, error recovery, and much more.
+behalf of a client.  The client can issue a single, short lived request 
+to move an image.  Unlike traditional upload/downloads the client does 
+not have to live for the length of the transfer marshaling the protocol 
+de jour for every single byte.  Instead it issues a request and then 
+ends. Later it can check back in with the service to determine progress.  
+Staccato does the work of protocol negotiation and optimal parameter 
+setting, scheduling the transfer, error recovery, and much more.
 
 Contents
 ============
@@ -31,3 +31,4 @@ Contents
 .. toctree::
    :maxdepth: 1
    architecture
+   need
