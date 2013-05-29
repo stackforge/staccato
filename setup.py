@@ -48,5 +48,6 @@ setuptools.setup(
     ],
     entry_points={'console_scripts':
                   ['staccato-api=staccato.cmd.api:main',
+                  ['staccato-scheduler=staccato.cmd.scheduler:main',
                   ]},
     py_modules=[])

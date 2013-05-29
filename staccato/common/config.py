@@ -15,6 +15,7 @@ paste_deploy_opts = [
     cfg.StrOpt('config_file',
                help=_('Name of the paste configuration file.')),
 ]
+
 common_opts = [
     cfg.ListOpt('protocol_plugins',
                 default=['staccato.protocols.file.FileProtocol',
