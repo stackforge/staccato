@@ -93,5 +93,6 @@ def get_protocol_policy(conf):
     if protocol_conf_file is None:
         # TODO log a warning
         return {}
-    policy = json.load(open(protocol_conf_file, 'r'))
+    proto_file = conf.find_file(protocol_conf_file)
+    policy = json.load(open(proto_file, 'r'))
     return policy
