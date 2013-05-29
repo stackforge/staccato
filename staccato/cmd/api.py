@@ -20,7 +20,7 @@ def fail(returncode, e):
 def main():
     try:
         conf = config.get_config_object()
-        paste_file = conf.paste_deploy.config_file
+        paste_file = conf.find_file(conf.paste_deploy.config_file)
         wsgi_app = os_pastedeploy.paste_deploy_app(paste_file,
                                                    'staccato-api',
                                                    conf)
