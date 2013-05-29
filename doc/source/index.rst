@@ -30,5 +30,6 @@ Contents
 
 .. toctree::
    :maxdepth: 1
+   quickstart
    architecture
    need
