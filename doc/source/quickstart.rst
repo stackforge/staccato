@@ -46,13 +46,13 @@ Interact With curl
 
 Request a transfer::
 
-    $ curl   localhost:9595/v1/urlxfer -H 'x-xfer-srcurl:file:///bin/bash' -H 'x-xfer-dsturl:file:///tmp/test1' {"progress": 0, "dsturl": "file:///tmp/test1", "srcurl": "file:///bin/bash", "id": "b7901019-dc33-4abc-be55-76ce2b2206a5", "state": "STATE_NEW"}
+    $ curl   localhost:5309/v1/urlxfer -H 'x-xfer-srcurl:file:///bin/bash' -H 'x-xfer-dsturl:file:///tmp/test1' {"progress": 0, "dsturl": "file:///tmp/test1", "srcurl": "file:///bin/bash", "id": "b7901019-dc33-4abc-be55-76ce2b2206a5", "state": "STATE_NEW"}
 
 Check the status::
 
-    $ curl localhost:9595/v1/status/b7901019-dc33-4abc-be55-76ce2b2206a5
+    $ curl localhost:5309/v1/status/b7901019-dc33-4abc-be55-76ce2b2206a5
     {"progress": 0, "dsturl": "file:///tmp/test1", "srcurl": "file:///bin/bash", "id": "b7901019-dc33-4abc-be55-76ce2b2206a5", "state": "STATE_COMPLETE"}
 
 Clean up::
 
-    $ curl localhost:9595/v1/delete/b7901019-dc33-4abc-be55-76ce2b2206a5
+    $ curl localhost:5309/v1/delete/b7901019-dc33-4abc-be55-76ce2b2206a5
