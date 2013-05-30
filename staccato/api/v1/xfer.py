@@ -4,14 +4,7 @@ import urlparse
 
 import routes
 import webob
-from webob.exc import (HTTPError,
-                       HTTPNotFound,
-                       HTTPConflict,
-                       HTTPBadRequest,
-                       HTTPForbidden,
-                       HTTPRequestEntityTooLarge,
-                       HTTPInternalServerError,
-                       HTTPServiceUnavailable)
+import webob.exc
 
 import staccato.openstack.common.wsgi as os_wsgi
 import staccato.openstack.common.middleware.context as os_context
@@ -21,7 +14,6 @@ from staccato import db
 from staccato.xfer.constants import Events
 from staccato.common import config, exceptions
 from staccato.common import utils
-
 
 
 class UnauthTestMiddleware(os_context.ContextMiddleware):
@@ -48,7 +40,7 @@ class XferController(object):
             return self.db_con.lookup_xfer_request_by_id(
                 xfer_id, owner=owner)
         except exceptions.StaccatoNotFoundInDBException, db_ex:
-            raise HTTPNotFound(explanation="No such ID %s" % xfer_id,
+            raise webob.exc.HTTPNotFound(explanation="No such ID %s" % xfer_id,
                                content_type="text/plain")
 
     def _to_state_machine(self, event, xfer_request, name):
@@ -60,7 +52,7 @@ class XferController(object):
             msg = _('You cannot %s a transfer that is in the %s '
                     'state. %s' % (name, xfer_request.state, ex))
             self._log_request(logging.INFO, msg)
-            raise HTTPBadRequest(explanation=msg,
+            raise webob.exc.HTTPBadRequest(explanation=msg,
                                  content_type="text/plain")
 
     def newtransfer(self, request, source_url, destination_url, owner,
