@@ -18,7 +18,7 @@ States
 * STATE_COMPLETE
 * STATE_DELETED
 
-.. _xfer_doc_type
+.. _xfer_doc_type:
 Xfer Document Type
 ******************
 
