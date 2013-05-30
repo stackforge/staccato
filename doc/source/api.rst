@@ -63,16 +63,15 @@ Xfer Document Type
 
 Example::
 
-{"start_offset": 0, 
- "id": "590edf8c-1b2b-44d0-af6a-d9190753b6eb", 
- "state": "STATE_NEW", 
- "progress": 0, 
- "end_offset": -1,
- "source_url": "file:///bin/bash",
- "destination_options": {},
- "destination_url": "file:///tmp/ooo",
- "source_options": {}}
-
+    {"start_offset": 0, 
+     "id": "590edf8c-1b2b-44d0-af6a-d9190753b6eb", 
+     "state": "STATE_NEW", 
+     "progress": 0, 
+     "end_offset": -1,
+     "source_url": "file:///bin/bash",
+     "destination_options": {},
+     "destination_url": "file:///tmp/ooo",
+     "source_options": {}}
 
 
 List All Transfers
