@@ -18,9 +18,9 @@ States
 * STATE_COMPLETE
 * STATE_DELETED
 
+.. _xfer_doc_type
 Xfer Document Type
 ******************
-.. _xfer_doc_type
 
 * id : UUID
 
@@ -109,7 +109,7 @@ Optional
 Response
 ********
 * code: 201
-* :ref:`xfer_doc_type` xfer document type
+* s :ref:`xfer_doc_type`. xfer document type
 
 Check Transfer Status
 ---------------------
