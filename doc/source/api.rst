@@ -109,7 +109,7 @@ Optional
 Response
 ********
 * code: 201
-* s :ref:`_xfer-doc-yype:`. xfer document type
+* xfer document type
 
 Check Transfer Status
 ---------------------
