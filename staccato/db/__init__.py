@@ -137,6 +137,9 @@ class StaccatoDB(object):
                 query = query.filter(sql_expression.and_(
                     models.XferRequest.owner == owner,
                     models.XferRequest.state == constants.States.STATE_RUNNING))
+            else:
+                query = query.filter(
+                    models.XferRequest.state == constants.States.STATE_RUNNING)
             if limit is not None:
                 query = query.limit(limit)
             xfer_requests = query.all()

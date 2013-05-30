@@ -1,7 +1,12 @@
 import testtools
 
-import staccato.xfer.utils as xfers_utils
+import staccato.tests.utils as tests_utils
+import staccato.common.utils as common_utils
 
+import staccato.xfer.utils as xfers_utils
+import staccato.protocols.interface as proto_iface
+import staccato.common.exceptions as exceptions
+import staccato.common.config as config
 
 class FakeXferRequest(object):
         next_ndx = 0
@@ -66,3 +71,37 @@ class TestXferCheckpointerSingleSync(testtools.TestCase):
         blocks = [(30, 40), (0, 10), (20, 30), (10, 25)]
         self._run_blocks(blocks)
         self.assertEqual(self.fake_xfer.next_ndx, 40)
+
+class TestBasicUtils(tests_utils.TempFileCleanupBaseTest):
+
+    def test_empty_interface(self):
+        blank_interface = proto_iface.BaseProtocolInterface()
+        kwargs = {
+            'url_parts': None,
+            'writer': None,
+            'monitor': None,
+            'source_opts': None,
+            'start': 0,
+            'end': None,
+        }
+
+        interface_funcs = [blank_interface.get_reader,
+                           blank_interface.get_writer,
+                           blank_interface.new_read,
+                           blank_interface.new_write]
+
+        for func in interface_funcs:
+            self.assertRaises(
+                exceptions.StaccatoNotImplementedException,
+                func,
+                **kwargs)
+
+    def test_load_paste_app_error(self):
+        conf = config.get_config_object(args=[])
+        p_file = self.get_tempfile()
+        self.assertRaises(
+            RuntimeError,
+            common_utils.load_paste_app,
+            'notthere', p_file, conf)
+
+    # TODO: test the loading of a good app
