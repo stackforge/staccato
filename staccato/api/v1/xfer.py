@@ -3,6 +3,7 @@ import logging
 import urlparse
 
 import routes
+import webob
 from webob.exc import (HTTPError,
                        HTTPNotFound,
                        HTTPConflict,
@@ -42,10 +43,10 @@ class XferController(object):
         self.log = logging
         self.conf = conf
 
-    def _xfer_from_db(self, xfer_id, request):
+    def _xfer_from_db(self, xfer_id, owner):
         try:
             return self.db_con.lookup_xfer_request_by_id(
-                xfer_id, owner=request.context.owner)
+                xfer_id, owner=owner)
         except exceptions.StaccatoNotFoundInDBException, db_ex:
             raise HTTPNotFound(explanation="No such ID %s" % xfer_id,
                                content_type="text/plain")
@@ -62,10 +63,19 @@ class XferController(object):
             raise HTTPBadRequest(explanation=msg,
                                  content_type="text/plain")
 
-    def urlxfer(self, request, srcurl, dsturl, dstopts=None, srcopts=None,
-                start_ndx=0, end_ndx=None):
-        srcurl_parts = urlparse.urlparse(srcurl)
-        dsturl_parts = urlparse.urlparse(dsturl)
+    def newtransfer(self, request, source_url, destination_url, owner,
+                    source_options=None, destination_options=None,
+                    start_offset=0, end_offset=None):
+        srcurl_parts = urlparse.urlparse(source_url)
+        dsturl_parts = urlparse.urlparse(destination_url)
+
+        dstopts={}
+        srcopts={}
+
+        if source_options is not None:
+            srcopts = source_options
+        if destination_options is not None:
+            dstopts = destination_options
 
         plugin_policy = config.get_protocol_policy(self.conf)
         src_module_name = utils.find_protocol_module_name(plugin_policy,
@@ -76,27 +86,27 @@ class XferController(object):
         src_module = utils.load_protocol_module(src_module_name, self.conf)
         dst_module = utils.load_protocol_module(dst_module_name, self.conf)
 
-        write_info = dst_module.new_write(dsturl_parts, dstopts)
-        read_info = src_module.new_write(srcurl_parts, srcopts)
+        dstopts = dst_module.new_write(dsturl_parts, dstopts)
+        srcopts = src_module.new_read(srcurl_parts, srcopts)
 
         db_con = db.StaccatoDB(self.conf)
-        xfer = db_con.get_new_xfer(request.context.owner,
-                                   srcurl,
-                                   dsturl,
+        xfer = db_con.get_new_xfer(owner,
+                                   source_url,
+                                   destination_url,
                                    src_module_name,
                                    dst_module_name,
-                                   start_ndx=start_ndx,
-                                   end_ndx=end_ndx,
-                                   read_info=read_info,
-                                   write_info=write_info)
+                                   start_ndx=start_offset,
+                                   end_ndx=end_offset,
+                                   source_opts=srcopts,
+                                   dest_opts=dstopts)
         return xfer
 
-    def status(self, request, xfer_id):
-        xfer = self._xfer_from_db(xfer_id, request)
+    def status(self, request, xfer_id, owner):
+        xfer = self._xfer_from_db(xfer_id, owner)
         return xfer
 
-    def list(self, request, limit=None):
-        return self.db_con.lookup_xfer_request_all(owner=request.context.owner)
+    def list(self, request, owner):
+        return self.db_con.lookup_xfer_request_all(owner=owner)
 
     def _xfer_to_dict(self, x):
         d = {}
@@ -107,14 +117,14 @@ class XferController(object):
         d['progress'] = x.next_ndx
         return d
 
-    def delete(self, request, xfer_id):
-        xfer_request = self._xfer_from_db(xfer_id, request)
+    def delete(self, request, xfer_id, owner):
+        xfer_request = self._xfer_from_db(xfer_id, owner)
         self._to_state_machine(Events.EVENT_DELETE,
                                xfer_request,
                                'delete')
 
-    def cancel(self, request, xfer_id):
-        xfer_request = self._xfer_from_db(xfer_id, request)
+    def xferaction(self, request, xfer_id, owner, xferaction, **kwvals):
+        xfer_request = self._xfer_from_db(xfer_id, owner)
         self._to_state_machine(Events.EVENT_CANCEL,
                                xfer_request,
                                'cancel')
@@ -126,55 +136,100 @@ class XferController(object):
         self.log.log(level, msg)
 
 
-class XferDeserializer(os_wsgi.RequestHeadersDeserializer):
+class XferHeaderDeserializer(os_wsgi.RequestHeadersDeserializer):
+    def default(self, request):
+        return {'owner': request.context.owner}
+
+
+class XferDeserializer(os_wsgi.JSONDeserializer):
     """Default request headers deserializer"""
 
-    meta_string = 'x-xfer-'
+    def _validate(self, body, required, optional):
+        request = {}
+        for k in body:
+            if k not in required and k not in optional:
+                msg = '%s is an unknown option.' % k
+                raise webob.exc.HTTPBadRequest(explanation=msg)
+        for k in required:
+            if k not in body:
+                msg = 'The option %s must be specified.' % k
+                raise webob.exc.HTTPBadRequest(explanation=msg)
+            request[k] = body[k]
+        for k in optional:
+            if k in body:
+                request[k] = body[k]
+        return request
 
-    def _pullout_xxfers(self, request):
-        d = {}
-        for h in request.headers:
-           if h.lower().startswith(self.meta_string):
-                key = h[len(self.meta_string):].lower().replace("-", "_")
-                val = request.headers[h]
-                d[key] = val
-        return d
+    def newtransfer(self, body):
+        _required = ['source_url', 'destination_url']
+        _optional = ['source_options', 'destination_options', 'start_offset',
+                    'end_offset', ]
+        request = self._validate(body, _required, _optional)
+        return request
 
-    def default(self, request):
-        return self._pullout_xxfers(request)
+    def list(self, body):
+        _required = []
+        _optional = ['limit', 'next', 'filter',]
+        request = self._validate(self._from_json(body), _required, _optional)
+        return request
+
+    def status(self, body):
+        request = self._validate(self._from_json(body), [], [])
+        return request
+
+    def delete(self, body):
+        request = self._validate(self._from_json(body), [], [])
+        return request
+
+    def cancel(self, body):
+        _required = ['xferaction']
+        _optional = ['async']
+        request = self._validate(body, _required, _optional)
+        return request
+
+    def xferaction(self, body):
+        body = self._from_json(body)
+        actions = {'cancel': self.cancel}
+        action_key = 'xferaction'
+        if action_key not in body:
+            msg = 'You must have an action entry in the body with one of ' \
+                  'the following %s' % str(actions)
+            raise webob.exc.HTTPBadRequest(explanation=msg)
+        action = body[action_key]
+        if action not in actions:
+            msg = '%s is not a valid action.' % action
+            raise webob.exc.HTTPBadRequest(explanation=msg)
+        func = actions[action]
+        return func(body)
 
 
-class XferSerializer(os_wsgi.DictSerializer):
+class XferSerializer(os_wsgi.JSONDictSerializer):
 
     def serialize(self, data, action='default', *args):
         return super(XferSerializer, self).serialize(data, args[0])
-
-    def status(self, data):
-        return self._xfer_to_json(data)
-
-    def cancel(self, data):
-        return self._xfer_to_json(data)
-
-    def delete(self, data):
-        return self._xfer_to_json(data)
-
-    def urlxfer(self, data):
-        return self._xfer_to_json(data)
 
     def _xfer_to_json(self, data):
         x = data
         d = {}
         d['id'] = x.id
-        d['srcurl'] = x.srcurl
-        d['dsturl'] = x.dsturl
+        d['source_url'] = x.srcurl
+        d['destination_url'] = x.dsturl
         d['state'] = x.state
+        d['start_offset'] = x.start_ndx
+        d['end_offset'] = x.end_ndx
         d['progress'] = x.next_ndx
+        d['source_options'] = x.source_opts
+        d['destination_options'] = x.dest_opts
+        return d
+
+    def default(self, data):
+        d = self._xfer_to_json(data)
         return json.dumps(d)
 
     def list(self, data):
         xfer_list = []
         for xfer in data:
-            xfer_list.append(xfer.id)
+            xfer_list.append(self._xfer_to_json(xfer))
         return json.dumps(xfer_list)
 
 
@@ -191,32 +246,35 @@ class API(os_wsgi.Router):
         controller = XferController(self.db_con, self.sm, self.conf)
         mapper = routes.Mapper()
 
+        body_deserializers = {'application/json': XferDeserializer()}
         deserializer = os_wsgi.RequestDeserializer(
-            headers_deserializer=XferDeserializer())
+            body_deserializers=body_deserializers,
+            headers_deserializer=XferHeaderDeserializer())
         serializer = XferSerializer()
-        sc = os_wsgi.Resource(controller,
+        transfer_resource = os_wsgi.Resource(controller,
                               deserializer=deserializer,
                               serializer=serializer)
 
-        mapper.connect(None,
-                       "/urlxfer",
-                       controller=sc,
-                       action="urlxfer")
-        mapper.connect(None,
-                       "/status/{xfer_id}",
-                       controller=sc,
-                       action="status")
-        mapper.connect(None,
-                       "/cancel/{xfer_id}",
-                       controller=sc,
-                       action="cancel")
-        mapper.connect(None,
-                       "/delete/{xfer_id}",
-                       controller=sc,
-                       action="delete")
-        mapper.connect(None,
-                       "/list",
-                       controller=sc,
-                       action="list")
+        mapper.connect('/transfers',
+                       controller=transfer_resource,
+                       action='newtransfer',
+                       conditions={'method': ['POST']})
+        mapper.connect('/transfers',
+                       controller=transfer_resource,
+                       action='list',
+                       conditions={'method': ['GET']})
+        mapper.connect('/transfers/{xfer_id}',
+                       controller=transfer_resource,
+                       action='status',
+                       conditions={'method': ['GET']})
+        mapper.connect('/transfers/{xfer_id}',
+                       controller=transfer_resource,
+                       action='delete',
+                       conditions={'method': ['DELETE']})
+        mapper.connect('/transfers/{xfer_id}/action',
+                       controller=transfer_resource,
+                       action='xferaction',
+                       conditions={'method': ['POST']})
 
         super(API, self).__init__(mapper)
+

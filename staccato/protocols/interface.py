@@ -4,20 +4,20 @@ from staccato.common import utils
 class BaseProtocolInterface(object):
 
     @utils.not_implemented_decorator
-    def get_reader(self, url_parts, writer, monitor, start=0, end=None,
-                   **kwvals):
+    def get_reader(self, url_parts, writer, monitor, source_opts, start=0,
+                   end=None, **kwvals):
         pass
 
     @utils.not_implemented_decorator
-    def get_writer(self, url_parts, checkpointer, **kwvals):
+    def get_writer(self, url_parts, dest_opts, checkpointer, **kwvals):
         pass
 
     @utils.not_implemented_decorator
-    def new_write(self, dsturl_parts, dst_opts):
+    def new_write(self, request, dsturl_parts, dst_opts):
         pass
 
     @utils.not_implemented_decorator
-    def new_read(self, srcurl_parts, src_opts):
+    def new_read(self, request, srcurl_parts, src_opts):
         pass
 
 

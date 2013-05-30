@@ -35,8 +35,8 @@ class StaccatoDB(object):
                      dst_module_name,
                      start_ndx=0,
                      end_ndx=-1,
-                     read_info=None,
-                     write_info=None,
+                     source_opts=None,
+                     dest_opts=None,
                      session=None):
 
         if session is None:
@@ -52,6 +52,8 @@ class StaccatoDB(object):
             xfer_request.start_ndx = start_ndx
             xfer_request.next_ndx = start_ndx
             xfer_request.end_ndx = end_ndx
+            xfer_request.dest_opts = dest_opts
+            xfer_request.source_opts = source_opts
             xfer_request.state = "STATE_NEW"
 
             session.add(xfer_request)

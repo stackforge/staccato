@@ -12,13 +12,18 @@ class HttpProtocol(base.BaseProtocolInterface):
     def _validate_url(self, url_parts):
         pass
 
+    def _parse_opts(self, opts):
+        return opts
+
     def new_write(self, dsturl_parts, dst_opts):
-        return {}
+        opts = self._parse_opts(dst_opts)
+        return opts
 
     def new_read(self, srcurl_parts, src_opts):
-        return
+        opts = self._parse_opts(src_opts)
+        return opts
 
-    def get_reader(self, url_parts, writer, monitor, start=0,
+    def get_reader(self, url_parts, writer, monitor, source_opts, start=0,
                    end=None, **kwvals):
         self._validate_url(url_parts)
 
@@ -29,7 +34,7 @@ class HttpProtocol(base.BaseProtocolInterface):
                                   end=end,
                                   **kwvals)
 
-    def get_writer(self, url_parts, checkpointer, **kwvals):
+    def get_writer(self, url_parts, dest_opts, checkpointer, **kwvals):
         raise exceptions.StaccatoNotImplementedException(
             _('The HTTP protocol is read only'))
 
