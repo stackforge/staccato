@@ -46,13 +46,24 @@ Interact With curl
 
 Request a transfer::
 
-    $ curl   localhost:5309/v1/urlxfer -H 'x-xfer-srcurl:file:///bin/bash' -H 'x-xfer-dsturl:file:///tmp/test1' {"progress": 0, "dsturl": "file:///tmp/test1", "srcurl": "file:///bin/bash", "id": "b7901019-dc33-4abc-be55-76ce2b2206a5", "state": "STATE_NEW"}
+    $ curl -X POST http://localhost:5309/v1/transfers --data '{"source_url": "file:///bin/bash", "destination_url": "file:///tmp/ooo"}' -H "Content-Type: application/json"
+    {"start_offset": 0, "id": "2eade223-b11b-413b-9185-7b16c1b2ed6d", "state": "STATE_NEW", "progress": 0, "end_offset": -1, "source_url": "file:///bin/bash", "destination_options": {}, "destination_url": "file:///tmp/ooo", "source_options": {}}
 
 Check the status::
 
-    $ curl localhost:5309/v1/status/b7901019-dc33-4abc-be55-76ce2b2206a5
-    {"progress": 0, "dsturl": "file:///tmp/test1", "srcurl": "file:///bin/bash", "id": "b7901019-dc33-4abc-be55-76ce2b2206a5", "state": "STATE_COMPLETE"}
+    $ curl -X GET http://localhost:5309/v1/transfers/2eade223-b11b-413b-9185-7b16c1b2ed6d 
+    {"start_offset": 0, "id": "2eade223-b11b-413b-9185-7b16c1b2ed6d", "state": "STATE_NEW", "progress": 0, "end_offset": -1, "source_url": "file:///bin/bash", "destination_options": {}, "destination_url": "file:///tmp/ooo", "source_options": {}
+
+
+Cancel::
+
+    $ curl -X POST http://localhost:5309/v1/transfers/2eade223-b11b-413b-9185-7b16c1b2ed6d/action --data '{"xferaction": "cancel"}'  -H "Content-Type: application/json"
+
 
 Clean up::
 
-    $ curl localhost:5309/v1/delete/b7901019-dc33-4abc-be55-76ce2b2206a5
+    $ curl -X DELETE http://localhost:5309/v1/transfers/2eade223-b11b-413b-9185-7b16c1b2ed6d 
+
+List all::
+
+    $ curl -X GET http://localhost:5309/v1/transfers

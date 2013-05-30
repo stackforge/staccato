@@ -33,3 +33,4 @@ Contents
    quickstart
    architecture
    need
+   api

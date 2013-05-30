@@ -164,7 +164,7 @@ class XferDeserializer(os_wsgi.JSONDeserializer):
         _required = ['source_url', 'destination_url']
         _optional = ['source_options', 'destination_options', 'start_offset',
                     'end_offset', ]
-        request = self._validate(body, _required, _optional)
+        request = self._validate(self._from_json(body), _required, _optional)
         return request
 
     def list(self, body):
