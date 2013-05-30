@@ -18,7 +18,7 @@ States
 * STATE_COMPLETE
 * STATE_DELETED
 
-.. _xfer_doc_type:
+.. _xfer-doc-yype:
 Xfer Document Type
 ******************
 
@@ -109,7 +109,7 @@ Optional
 Response
 ********
 * code: 201
-* s :ref:`xfer_doc_type`. xfer document type
+* s :ref:`_xfer-doc-yype:`. xfer document type
 
 Check Transfer Status
 ---------------------
