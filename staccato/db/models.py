@@ -5,6 +5,7 @@ SQLAlchemy models for staccato data
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Integer
+from sqlalchemy import PickleType
 from sqlalchemy import String
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -42,8 +43,8 @@ class XferRequest(BASE, ModelBase):
     next_ndx = Column(Integer(), nullable=False)
     end_ndx = Column(Integer(), nullable=False, default=-1)
     # TODO add protocol specific json documents
-    write_info = Column(String(512))
-    read_info = Column(String(512))
+    source_opts = Column(PickleType())
+    dest_opts = Column(PickleType())
 
 
 def register_models(engine):

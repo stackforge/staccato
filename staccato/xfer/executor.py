@@ -24,13 +24,15 @@ def do_transfer(CONF, xfer_id, state_machine):
 
         dsturl_parts = urlparse.urlparse(request.dsturl)
         writer = dst_module.get_writer(dsturl_parts,
-                                        checkpointer=checkpointer)
+                                       request.dest_opts,
+                                       checkpointer=checkpointer)
 
         # it is up to the reader/writer to put on the bw limits
         srcurl_parts = urlparse.urlparse(request.srcurl)
         reader = src_module.get_reader(srcurl_parts,
                                        writer,
                                        monitor,
+                                       request.source_opts,
                                        request.next_ndx,
                                        request.end_ndx)
 

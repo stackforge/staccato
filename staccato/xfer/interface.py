@@ -20,7 +20,7 @@ def xfer_new(CONF, srcurl, dsturl, src_opts, dst_opts, start_ndx=0,
     dst_module = utils.load_protocol_module(dst_module_name, CONF)
 
     write_info = dst_module.new_write(dsturl_parts, dst_opts)
-    read_info = src_module.new_write(srcurl_parts, src_opts)
+    read_info = src_module.new_read(srcurl_parts, src_opts)
 
     db_con = db.StaccatoDB(CONF)
     xfer = db_con.get_new_xfer(srcurl,

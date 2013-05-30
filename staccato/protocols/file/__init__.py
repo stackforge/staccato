@@ -11,12 +11,12 @@ class FileProtocol(base.BaseProtocolInterface):
         pass
 
     def new_write(self, dsturl_parts, dst_opts):
-        return {}
+        return dst_opts
 
     def new_read(self, srcurl_parts, src_opts):
-        return
+        return src_opts
 
-    def get_reader(self, url_parts, writer, monitor, start=0,
+    def get_reader(self, url_parts, writer, monitor, source_opts, start=0,
                    end=None, **kwvals):
         self._validate_url(url_parts)
 
@@ -28,7 +28,7 @@ class FileProtocol(base.BaseProtocolInterface):
                                   buflen=65536,
                                   **kwvals)
 
-    def get_writer(self, url_parts, checkpointer, **kwvals):
+    def get_writer(self, url_parts, dest_opts, checkpointer, **kwvals):
         self._validate_url(url_parts)
 
         return FileWriteConnection(url_parts.path, checkpointer=checkpointer,
