@@ -41,7 +41,7 @@ class XferController(object):
                 xfer_id, owner=owner)
         except exceptions.StaccatoNotFoundInDBException, db_ex:
             raise webob.exc.HTTPNotFound(explanation="No such ID %s" % xfer_id,
-                               content_type="text/plain")
+                                         content_type="text/plain")
 
     def _to_state_machine(self, event, xfer_request, name):
         try:
@@ -53,7 +53,7 @@ class XferController(object):
                     'state. %s' % (name, xfer_request.state, ex))
             self._log_request(logging.INFO, msg)
             raise webob.exc.HTTPBadRequest(explanation=msg,
-                                 content_type="text/plain")
+                                           content_type="text/plain")
 
     def newtransfer(self, request, source_url, destination_url, owner,
                     source_options=None, destination_options=None,
@@ -61,8 +61,8 @@ class XferController(object):
         srcurl_parts = urlparse.urlparse(source_url)
         dsturl_parts = urlparse.urlparse(destination_url)
 
-        dstopts={}
-        srcopts={}
+        dstopts = {}
+        srcopts = {}
 
         if source_options is not None:
             srcopts = source_options
@@ -155,13 +155,13 @@ class XferDeserializer(os_wsgi.JSONDeserializer):
     def newtransfer(self, body):
         _required = ['source_url', 'destination_url']
         _optional = ['source_options', 'destination_options', 'start_offset',
-                    'end_offset', ]
+                     'end_offset']
         request = self._validate(self._from_json(body), _required, _optional)
         return request
 
     def list(self, body):
         _required = []
-        _optional = ['limit', 'next', 'filter',]
+        _optional = ['limit', 'next', 'filter']
         request = self._validate(self._from_json(body), _required, _optional)
         return request
 
@@ -244,8 +244,8 @@ class API(os_wsgi.Router):
             headers_deserializer=XferHeaderDeserializer())
         serializer = XferSerializer()
         transfer_resource = os_wsgi.Resource(controller,
-                              deserializer=deserializer,
-                              serializer=serializer)
+                                             deserializer=deserializer,
+                                             serializer=serializer)
 
         mapper.connect('/transfers',
                        controller=transfer_resource,
@@ -269,4 +269,3 @@ class API(os_wsgi.Router):
                        conditions={'method': ['POST']})
 
         super(API, self).__init__(mapper)
-

@@ -116,7 +116,8 @@ class StaccatoDB(object):
                     models.XferRequest.owner == owner,
                     sql_expression.or_(
                         models.XferRequest.state == constants.States.STATE_NEW,
-                        models.XferRequest.state == constants.States.STATE_ERROR)))
+                        models.XferRequest.state ==
+                            constants.States.STATE_ERROR)))
             else:
                 query = query.filter(sql_expression.or_(
                     models.XferRequest.state == constants.States.STATE_NEW,
@@ -136,7 +137,8 @@ class StaccatoDB(object):
             if owner is not None:
                 query = query.filter(sql_expression.and_(
                     models.XferRequest.owner == owner,
-                    models.XferRequest.state == constants.States.STATE_RUNNING))
+                    models.XferRequest.state ==
+                        constants.States.STATE_RUNNING))
             else:
                 query = query.filter(
                     models.XferRequest.state == constants.States.STATE_RUNNING)
@@ -154,7 +156,7 @@ class StaccatoDB(object):
             if owner is not None:
                 query = query.filter(
                     sql_expression.and_(models.XferRequest.owner == owner,
-                    models.XferRequest.id.in_(ids)))
+                                        models.XferRequest.id.in_(ids)))
             else:
                 query = query.filter(models.XferRequest.id.in_(ids))
             xfer_requests = query.all()

@@ -76,5 +76,5 @@ class StateMachine(object):
                     p_start_state = start_state.replace("STATE_", '')
                     p_event = event.replace("EVENT_", '')
                     print '%s  -> %s [ label = "%s" ];'\
-                           % (p_start_state, p_end_state, p_event)
+                        % (p_start_state, p_end_state, p_event)
         print '}'

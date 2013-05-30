@@ -8,6 +8,7 @@ import staccato.protocols.interface as proto_iface
 import staccato.common.exceptions as exceptions
 import staccato.common.config as config
 
+
 class FakeXferRequest(object):
         next_ndx = 0
 
@@ -72,6 +73,7 @@ class TestXferCheckpointerSingleSync(testtools.TestCase):
         self._run_blocks(blocks)
         self.assertEqual(self.fake_xfer.next_ndx, 40)
 
+
 class TestBasicUtils(tests_utils.TempFileCleanupBaseTest):
 
     def test_empty_interface(self):
@@ -103,5 +105,3 @@ class TestBasicUtils(tests_utils.TempFileCleanupBaseTest):
             RuntimeError,
             common_utils.load_paste_app,
             'notthere', p_file, conf)
-
-    # TODO: test the loading of a good app

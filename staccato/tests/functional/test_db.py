@@ -224,7 +224,6 @@ class TestDB(utils.TempFileCleanupBaseTest):
         xfer2.state = constants.States.STATE_ERROR
         self.db.save_db_obj(xfer2)
 
-
         xfer_list = self.db.get_all_ready()
         id_list = [x.id for x in xfer_list]
 

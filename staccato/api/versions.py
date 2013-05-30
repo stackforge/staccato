@@ -14,11 +14,9 @@ class VersionApp(object):
 
     @webob.dec.wsgify(RequestClass=os_wsgi.Request)
     def __call__(self, req):
-        version_info = {
-                'id': self.conf.service_id,
-                'version': self.conf.version,
-                'status': 'active'
-            }
+        version_info = {'id': self.conf.service_id,
+                        'version': self.conf.version,
+                        'status': 'active'}
         version_objs = [version_info]
 
         response = webob.Response(request=req,

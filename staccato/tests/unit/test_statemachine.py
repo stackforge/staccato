@@ -5,6 +5,7 @@ import mox
 import staccato.xfer.events as xfer_events
 import staccato.xfer.constants as constants
 
+
 class TestEventsStateMachine(testtools.TestCase):
 
     def setUp(self):
@@ -14,7 +15,6 @@ class TestEventsStateMachine(testtools.TestCase):
     def tearDown(self):
         super(TestEventsStateMachine, self).tearDown()
         self.mox.UnsetStubs()
-
 
     def test_printer(self):
         # just make sure it works
@@ -31,7 +31,9 @@ class TestEventsStateMachine(testtools.TestCase):
         self.mox.StubOutWithMock(my_states, '_get_current_state')
         self.mox.StubOutWithMock(my_states, '_state_changed')
 
-        my_states._get_current_state(db=db, xfer_request=xfer_request).AndReturn(constants.States.STATE_NEW)
+        my_states._get_current_state(
+            db=db,
+            xfer_request=xfer_request).AndReturn(constants.States.STATE_NEW)
         my_states._state_changed(constants.States.STATE_NEW,
                                  constants.Events.EVENT_START,
                                  constants.States.STATE_RUNNING,
@@ -48,7 +50,6 @@ class TestEventsStateMachine(testtools.TestCase):
 
         self.mox.ReplayAll()
         my_states.event_occurred(constants.Events.EVENT_START,
-                                    xfer_request=xfer_request,
-                                    db=db)
+                                 xfer_request=xfer_request,
+                                 db=db)
         self.mox.VerifyAll()
-

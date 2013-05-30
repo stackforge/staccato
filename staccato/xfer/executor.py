@@ -39,16 +39,16 @@ def do_transfer(CONF, xfer_id, state_machine):
         reader.process()
     except Exception, ex:
         state_machine.event_occurred(constants.Events.EVENT_ERROR,
-                                    exception=ex,
-                                    conf=CONF,
-                                    xfer_request=request,
-                                    db=db_con)
+                                     exception=ex,
+                                     conf=CONF,
+                                     xfer_request=request,
+                                     db=db_con)
         raise
     finally:
         state_machine.event_occurred(constants.Events.EVENT_COMPLETE,
-                                   conf=CONF,
-                                   xfer_request=request,
-                                   db=db_con)
+                                     conf=CONF,
+                                     xfer_request=request,
+                                     db=db_con)
 
 
 class SimpleThreadExecutor(object):

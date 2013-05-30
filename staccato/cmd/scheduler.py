@@ -24,4 +24,3 @@ def main():
         sched.wait()
     except RuntimeError as e:
         fail(1, e)
-

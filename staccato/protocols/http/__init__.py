@@ -38,6 +38,7 @@ class HttpProtocol(base.BaseProtocolInterface):
         raise exceptions.StaccatoNotImplementedException(
             _('The HTTP protocol is read only'))
 
+
 class HttpReadConnection(base.BaseReadConnection):
 
     def __init__(self,
