@@ -81,16 +81,15 @@ class XferController(object):
         dstopts = dst_module.new_write(dsturl_parts, dstopts)
         srcopts = src_module.new_read(srcurl_parts, srcopts)
 
-        db_con = db.StaccatoDB(self.conf)
-        xfer = db_con.get_new_xfer(owner,
-                                   source_url,
-                                   destination_url,
-                                   src_module_name,
-                                   dst_module_name,
-                                   start_ndx=start_offset,
-                                   end_ndx=end_offset,
-                                   source_opts=srcopts,
-                                   dest_opts=dstopts)
+        xfer = self.db_con.get_new_xfer(owner,
+                                        source_url,
+                                        destination_url,
+                                        src_module_name,
+                                        dst_module_name,
+                                        start_ndx=start_offset,
+                                        end_ndx=end_offset,
+                                        source_opts=srcopts,
+                                        dest_opts=dstopts)
         return xfer
 
     def status(self, request, xfer_id, owner):
