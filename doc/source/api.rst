@@ -8,7 +8,6 @@ Data Types
 
 States
 ******
-
 * STATE_NEW
 * STATE_RUNNING
 * STATE_CANCELING
@@ -21,7 +20,6 @@ States
 .. _xfer-doc-yype:
 Xfer Document Type
 ******************
-
 * id : UUID
 
 * source_url : string
@@ -61,7 +59,6 @@ Xfer Document Type
   in use.  That plugin is determined by the scheme portion of the
   source URL.
 
-
 Example::
 
     {"start_offset": 0, 
@@ -77,30 +74,28 @@ Example::
 
 List All Transfers
 ------------------
-
 GET /v1/transfers
 
 Options: 
-- limit
-- next...
+* limit
+* next...
 
-response: 200
-List of xfer document types
+Response
+********
+* code: 200
+* A list of xfer document types
 
 Request a Transfer
 ------------------
-
 POST /v1/transfers
 
 Required Parameters
 *******************
-
 * source_url <string url>
 * destination_url <string url>
 
 Optional
 ********
-
 * source_options <json doc>
 * destination_options <json doc>
 * start_offset <int>
@@ -113,15 +108,15 @@ Response
 
 Check Transfer Status
 ---------------------
-
 GET /v1/transfers/{transfer id}
 
-response: 200
-xfer document types
+Response
+********
+* code: 200
+* xfer document type
 
 Cancel A Transfer
 -----------------
-
 POST /v1/transfers/{transfer id}/action
 
 Required Parameters:
@@ -129,29 +124,16 @@ Required Parameters:
 
 "Content-Type: application/json"
 
-Response: 202 (if async)
-          204 (if sync)
+Response
+********
+* code: 202 (if async)
+        204 (if sync)
 
 Delete A Transfer
 -----------------
-
 DELETE /v1/transfers/{transfer id}
 
-
-Response: 202 (if async)
-          204 (if sync)
-
-
-xfer Document Type
-------------------
-
-    id
-    source_url
-    destination_url
-    state
-    start_offset
-    end_offset
-    progress
-    source_options
-    destination_options
-
+Response
+********
+* code: 202 (if async)
+        204 (if sync)
