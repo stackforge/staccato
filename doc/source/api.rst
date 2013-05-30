@@ -9,17 +9,18 @@ Data Types
 States
 ******
 
-- STATE_NEW
-- STATE_RUNNING
-- STATE_CANCELING
-- STATE_CANCELED
-- STATE_ERRORING
-- STATE_ERROR
-- STATE_COMPLETE
-- STATE_DELETED
+* STATE_NEW
+* STATE_RUNNING
+* STATE_CANCELING
+* STATE_CANCELED
+* STATE_ERRORING
+* STATE_ERROR
+* STATE_COMPLETE
+* STATE_DELETED
 
 Xfer Document Type
 ******************
+.. _xfer_doc_type
 
 * id : UUID
 
@@ -92,20 +93,23 @@ Request a Transfer
 POST /v1/transfers
 
 Required Parameters
+*******************
 
-- source_url <string url>
-- destination_url <string url>
+* source_url <string url>
+* destination_url <string url>
 
 Optional
+********
 
-- source_options <json doc>
-- destination_options <json doc>
-- start_offset <int>
-- end_offset <int>
+* source_options <json doc>
+* destination_options <json doc>
+* start_offset <int>
+* end_offset <int>
 
-Response:
-201
-xfer document type
+Response
+********
+* code: 201
+* :ref:`xfer_doc_type` xfer document type
 
 Check Transfer Status
 ---------------------
