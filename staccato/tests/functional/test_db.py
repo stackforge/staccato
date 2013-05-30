@@ -8,6 +8,7 @@ class TestDB(utils.TempFileCleanupBaseTest):
     def setUp(self):
         super(TestDB, self).setUp()
 
+        self.owner = 'someperson'
         self.tmp_db = self.get_tempfile()
         self.db_url = 'sqlite:///%s' % (self.tmp_db)
 
@@ -28,7 +29,7 @@ class TestDB(utils.TempFileCleanupBaseTest):
         dst = "dst://url"
         sm = "src.module"
         dm = "dst.module"
-        xfer = self.db.get_new_xfer(src, dst, sm, dm)
+        xfer = self.db.get_new_xfer(self.owner, src, dst, sm, dm)
         self.assertEqual(src, xfer.srcurl)
         self.assertEqual(dst, xfer.dsturl)
         self.assertEqual(sm, xfer.src_module_name)
@@ -40,7 +41,7 @@ class TestDB(utils.TempFileCleanupBaseTest):
         sm = "src.module"
         dm = "dst.module"
 
-        xfer1 = self.db.get_new_xfer(src, dst, sm, dm)
+        xfer1 = self.db.get_new_xfer(self.owner, src, dst, sm, dm)
         xfer2 = self.db.lookup_xfer_request_by_id(xfer1.id)
         self.assertEqual(xfer1.id, xfer2.id)
 
@@ -50,7 +51,7 @@ class TestDB(utils.TempFileCleanupBaseTest):
         sm = "src.module"
         dm = "dst.module"
 
-        xfer1 = self.db.get_new_xfer(src, dst, sm, dm)
+        xfer1 = self.db.get_new_xfer(self.owner, src, dst, sm, dm)
         xfer1.next_ndx = 10
         self.db.save_db_obj(xfer1)
         xfer2 = self.db.lookup_xfer_request_by_id(xfer1.id)

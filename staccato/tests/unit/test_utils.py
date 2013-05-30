@@ -1,6 +1,6 @@
 import testtools
 
-import staccato.xfer.events as xfers
+import staccato.xfer.utils as xfers_utils
 
 
 class FakeXferRequest(object):
@@ -19,8 +19,8 @@ class TestXferCheckpointerSingleSync(testtools.TestCase):
         super(TestXferCheckpointerSingleSync, self).setUp()
 
         self.fake_xfer = FakeXferRequest()
-        self.checker = xfers.XferCheckpointer(self.fake_xfer, {},
-                                              FakeDB(), db_refresh_rate=0)
+        self.checker = xfers_utils.XferCheckpointer(
+            self.fake_xfer, {}, FakeDB(), db_refresh_rate=0)
 
     def _run_blocks(self, blocks):
         for start, end in blocks:
