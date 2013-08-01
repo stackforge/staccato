@@ -1,6 +1,7 @@
 import json
 import logging
 import urlparse
+import uuid
 
 import routes
 import webob
@@ -15,6 +16,11 @@ from staccato.xfer.constants import Events
 from staccato.common import config, exceptions
 from staccato.common import utils
 
+LOG = logging.getLogger(__name__)
+
+
+def _make_request_id(user, tenant):
+    return str(uuid.uuid4())
 
 class UnauthTestMiddleware(os_context.ContextMiddleware):
     def __init__(self, app, options):
@@ -22,9 +28,38 @@ class UnauthTestMiddleware(os_context.ContextMiddleware):
         super(UnauthTestMiddleware, self).__init__(app, options)
 
     def process_request(self, req):
+        LOG.debug('Making an unauthenticated context.')
         req.context = self.make_context(is_admin=True,
                                         user='admin')
         req.context.owner = 'admin'
+
+
+class AuthContextMiddleware(os_context.ContextMiddleware):
+    def __init__(self, app, options):
+        self.options = options
+        super(AuthContextMiddleware, self).__init__(app, options)
+
+    def process_request(self, req):
+        if req.headers.get('X-Identity-Status') == 'Confirmed':
+            req.context = self._get_authenticated_context(req)
+        else:
+            raise webob.exc.HTTPUnauthorized()
+
+    def _get_authenticated_context(self, req):
+        LOG.debug('Making an authenticated context.')
+        auth_token = req.headers.get('X-Auth-Token')
+        user = req.headers.get('X-User-Id')
+        tenant = req.headers.get('X-Tenant-Id')
+        is_admin = self.options.admin_user_id.strip().lower() == user
+
+        request_id = _make_request_id(user, tenant)
+
+        context = self.make_context(is_admin=is_admin, user=user,
+                                        tenant=tenant, auth_token=auth_token,
+                                        request_id=request_id)
+        context.owner = user
+
+        return context
 
 
 class XferController(object):

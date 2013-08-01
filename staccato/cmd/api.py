@@ -21,8 +21,12 @@ def main():
     try:
         conf = config.get_config_object()
         paste_file = conf.find_file(conf.paste_deploy.config_file)
+        if conf.paste_deploy.flavor is None:
+            flavor = 'staccato-api'
+        else:
+            flavor = 'staccato-api-' + conf.paste_deploy.flavor
         wsgi_app = os_pastedeploy.paste_deploy_app(paste_file,
-                                                   'staccato-api',
+                                                   flavor,
                                                    conf)
         server = os_wsgi.Service(wsgi_app, conf.bind_port)
         server.start()

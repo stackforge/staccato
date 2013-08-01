@@ -50,6 +50,8 @@ common_opts = [
                help=''),
     cfg.StrOpt('service_id', default='staccato1234',
                help=''),
+    cfg.StrOpt('admin_user_id', default='admin',
+               help='The user ID of the staccato admin'),
 ]
 bind_opts = [
     cfg.StrOpt('bind_host', default='0.0.0.0',
@@ -84,6 +86,13 @@ def get_config_object(args=None, usage=None, default_config_files=None):
          usage=usage,
          default_config_files=default_config_files)
     _log_string_to_val(conf)
+
+    # to make keystone client middleware work (massive bummer)
+    cfg.CONF(args=args,
+         project='staccato',
+         version=version.cached_version_string(),
+         usage=usage,
+         default_config_files=default_config_files)
 
     return conf
 
