@@ -22,6 +22,7 @@ LOG = logging.getLogger(__name__)
 def _make_request_id(user, tenant):
     return str(uuid.uuid4())
 
+
 class UnauthTestMiddleware(os_context.ContextMiddleware):
     def __init__(self, app, options):
         self.options = options
@@ -56,8 +57,8 @@ class AuthContextMiddleware(os_context.ContextMiddleware):
         request_id = _make_request_id(user, tenant)
 
         context = self.make_context(is_admin=is_admin, user=user,
-                                        tenant=tenant, auth_token=auth_token,
-                                        request_id=request_id)
+                                    tenant=tenant, auth_token=auth_token,
+                                    request_id=request_id)
         context.owner = user
 
         return context

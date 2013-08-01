@@ -89,10 +89,10 @@ def get_config_object(args=None, usage=None, default_config_files=None):
 
     # to make keystone client middleware work (massive bummer)
     cfg.CONF(args=args,
-         project='staccato',
-         version=version.cached_version_string(),
-         usage=usage,
-         default_config_files=default_config_files)
+             project='staccato',
+             version=version.cached_version_string(),
+             usage=usage,
+             default_config_files=default_config_files)
 
     return conf
 

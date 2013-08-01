@@ -58,7 +58,7 @@ def find_protocol_module_name(lookup_dict, url_parts):
         'The url %s is not supported' % url_parts.geturl())
 
 
-def  load_protocol_module(module_name, CONF):
+def load_protocol_module(module_name, CONF):
     try:
         protocol_cls = importutils.import_class(module_name)
     except ImportError, ie:
