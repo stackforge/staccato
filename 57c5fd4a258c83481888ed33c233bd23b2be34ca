@@ -1,0 +1,8 @@
+Verified+2: Jenkins
+Approved+1: John Bresnahan <jbresnah@redhat.com>
+Code-Review+2: John Bresnahan <jbresnah@redhat.com>
+Submitted-by: Jenkins
+Submitted-at: Thu, 01 Aug 2013 21:38:52 +0000
+Reviewed-on: https://review.openstack.org/39810
+Project: stackforge/staccato
+Branch: refs/heads/master
