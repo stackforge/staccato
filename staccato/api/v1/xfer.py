@@ -37,6 +37,7 @@ class UnauthTestMiddleware(os_context.ContextMiddleware):
 class AuthContextMiddleware(os_context.ContextMiddleware):
     def __init__(self, app, options):
         self.options = options
+        print options
         super(AuthContextMiddleware, self).__init__(app, options)
 
     def process_request(self, req):
