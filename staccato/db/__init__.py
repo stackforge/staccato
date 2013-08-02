@@ -85,11 +85,11 @@ class StaccatoDB(object):
                 xfer_request = query.one()
             return xfer_request
         except orm_exc.NoResultFound, nf_ex:
-            raise exceptions.StaccatoNotFoundInDBException(nf_ex)
+            raise exceptions.StaccatoNotFoundInDBException(nf_ex, xfer_id)
         except Exception, ex:
             raise exceptions.StaccatoDataBaseException(ex)
 
-    def lookup_xfer_request_all(self, owner=None, session=None):
+    def lookup_xfer_request_all(self, owner=None, session=None, limit=None):
         try:
             if session is None:
                 session = self.get_sessions()
@@ -98,10 +98,12 @@ class StaccatoDB(object):
                 query = session.query(models.XferRequest)
                 if owner is not None:
                     query = query.filter(models.XferRequest.owner == owner)
+                if limit is not None:
+                    query = query.limit(limit)
                 xfer_requests = query.all()
             return xfer_requests
         except orm_exc.NoResultFound, nf_ex:
-            raise exceptions.StaccatoNotFoundInDBException(nf_ex)
+            raise exceptions.StaccatoNotFoundInDBException(nf_ex, owner)
         except Exception, ex:
             raise exceptions.StaccatoDataBaseException(ex)
 
@@ -182,7 +184,7 @@ def _get_db_object(CONF):
         engine = sqlalchemy.create_engine(CONF.sql_connection, **engine_args)
         engine.connect = wrap_db_error(engine.connect, CONF)
         engine.connect()
-    except Exception, err:
+    except Exception as err:
         msg = _("Error configuring registry database with supplied "
                 "sql_connection '%s'. "
                 "Got error:\n%s") % (CONF.sql_connection, err)

@@ -2,6 +2,8 @@ import logging
 import re
 
 from paste import deploy
+import webob
+import webob.exc
 
 from staccato.common import exceptions
 from staccato.openstack.common import importutils
@@ -14,6 +16,45 @@ def not_implemented_decorator(func):
                 "function %s must be implemented" % (func.func_name))
         return raise_error(func)
     return call
+
+
+class StaccatoErrorToHTTP(object):
+
+    def __init__(self, operation, log):
+        self.operation = operation
+        self.log = log
+
+    def __call__(self, func):
+        def inner(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except exceptions.StaccatoNotFoundInDBException as ex:
+                msg = _("Failed to %s.  %s not found.") % (self.operation,
+                                                           ex.unfound_item)
+                self.log.error(msg)
+                raise webob.exc.HTTPNotFound(explanation=msg,
+                                             content_type="text/plain")
+
+            except exceptions.StaccatoInvalidStateTransitionException, ex:
+                msg = _('Failed to %s.  You cannot %s a transfer that is in '
+                        'the %s state. %s' % (self.operation,
+                                              ex.attempted_event,
+                                              ex.current_state,
+                                              ex))
+                self.log.error(msg)
+                raise webob.exc.HTTPBadRequest(explanation=msg,
+                                               content_type="text/plain")
+
+            except exceptions.StaccatoParameterError as ex:
+                msg = _('Failed to %s.  %s' % (self.operation, ex))
+                self.log.error(msg)
+                raise webob.exc.HTTPBadRequest(msg)
+
+            except Exception as ex:
+                msg = _('Failed to %s.  %s' % (self.operation, ex))
+                self.log.error(msg)
+                raise webob.exc.HTTPBadRequest(msg)
+        return inner
 
 
 def load_paste_app(app_name, conf_file, conf):

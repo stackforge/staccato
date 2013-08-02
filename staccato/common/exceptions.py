@@ -45,4 +45,7 @@ class StaccatoDatabaseException(StaccatoBaseException):
 
 
 class StaccatoNotFoundInDBException(StaccatoDataBaseException):
-    pass
+
+    def __init__(self, ex, unfound_item):
+        super(StaccatoNotFoundInDBException, self).__init__(self, ex)
+        self.unfound_item = unfound_item

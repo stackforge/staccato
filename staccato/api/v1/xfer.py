@@ -73,28 +73,19 @@ class XferController(object):
         self.conf = conf
 
     def _xfer_from_db(self, xfer_id, owner):
-        try:
-            return self.db_con.lookup_xfer_request_by_id(
-                xfer_id, owner=owner)
-        except exceptions.StaccatoNotFoundInDBException, db_ex:
-            raise webob.exc.HTTPNotFound(explanation="No such ID %s" % xfer_id,
-                                         content_type="text/plain")
+        return self.db_con.lookup_xfer_request_by_id(
+            xfer_id, owner=owner)
 
     def _to_state_machine(self, event, xfer_request, name):
-        try:
-            self.sm.event_occurred(event,
-                                   xfer_request=xfer_request,
-                                   db=self.db_con)
-        except exceptions.StaccatoInvalidStateTransitionException, ex:
-            msg = _('You cannot %s a transfer that is in the %s '
-                    'state. %s' % (name, xfer_request.state, ex))
-            self._log_request(logging.INFO, msg)
-            raise webob.exc.HTTPBadRequest(explanation=msg,
-                                           content_type="text/plain")
+        self.sm.event_occurred(event,
+                               xfer_request=xfer_request,
+                               db=self.db_con)
 
+    @utils.StaccatoErrorToHTTP('Create a new transfer', LOG)
     def newtransfer(self, request, source_url, destination_url, owner,
                     source_options=None, destination_options=None,
                     start_offset=0, end_offset=None):
+
         srcurl_parts = urlparse.urlparse(source_url)
         dsturl_parts = urlparse.urlparse(destination_url)
 
@@ -129,39 +120,28 @@ class XferController(object):
                                         dest_opts=dstopts)
         return xfer
 
+    @utils.StaccatoErrorToHTTP('Check the status', LOG)
     def status(self, request, xfer_id, owner):
         xfer = self._xfer_from_db(xfer_id, owner)
         return xfer
 
-    def list(self, request, owner):
-        return self.db_con.lookup_xfer_request_all(owner=owner)
+    @utils.StaccatoErrorToHTTP('List transfers', LOG)
+    def list(self, request, owner, limit=None):
+        return self.db_con.lookup_xfer_request_all(owner=owner, limit=limit)
 
-    def _xfer_to_dict(self, x):
-        d = {}
-        d['id'] = x.id
-        d['srcurl'] = x.srcurl
-        d['dsturl'] = x.dsturl
-        d['state'] = x.state
-        d['progress'] = x.next_ndx
-        return d
-
+    @utils.StaccatoErrorToHTTP('Delete a transfer', LOG)
     def delete(self, request, xfer_id, owner):
         xfer_request = self._xfer_from_db(xfer_id, owner)
         self._to_state_machine(Events.EVENT_DELETE,
                                xfer_request,
                                'delete')
 
+    @utils.StaccatoErrorToHTTP('Cancel a transfer', LOG)
     def xferaction(self, request, xfer_id, owner, xferaction, **kwvals):
         xfer_request = self._xfer_from_db(xfer_id, owner)
         self._to_state_machine(Events.EVENT_CANCEL,
                                xfer_request,
                                'cancel')
-
-    def _log_request(self, level, msg, ex=None):
-        # reformat the exception with context, user info, etc
-        if ex:
-            self.log.exception(msg)
-        self.log.log(level, msg)
 
 
 class XferHeaderDeserializer(os_wsgi.RequestHeadersDeserializer):
@@ -199,14 +179,6 @@ class XferDeserializer(os_wsgi.JSONDeserializer):
         _required = []
         _optional = ['limit', 'next', 'filter']
         request = self._validate(self._from_json(body), _required, _optional)
-        return request
-
-    def status(self, body):
-        request = self._validate(self._from_json(body), [], [])
-        return request
-
-    def delete(self, body):
-        request = self._validate(self._from_json(body), [], [])
         return request
 
     def cancel(self, body):
