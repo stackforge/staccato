@@ -1,6 +1,5 @@
 import json
 import mox
-import testtools
 import uuid
 
 import webob.exc

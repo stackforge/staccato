@@ -53,6 +53,7 @@ common_opts = [
     cfg.StrOpt('admin_user_id', default='admin',
                help='The user ID of the staccato admin'),
 ]
+
 bind_opts = [
     cfg.StrOpt('bind_host', default='0.0.0.0',
                help=_('Address to bind the server.  Useful when '
