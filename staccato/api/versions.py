@@ -2,6 +2,7 @@ import httplib
 import json
 import webob
 
+from staccato.common import config
 import staccato.openstack.common.wsgi as os_wsgi
 
 
@@ -17,6 +18,8 @@ class VersionApp(object):
         version_info = {'id': self.conf.service_id,
                         'version': self.conf.version,
                         'status': 'active'}
+        protocols = config.get_protocol_policy(self.conf).keys()
+        version_info['protocols'] = protocols
         version_objs = [version_info]
 
         response = webob.Response(request=req,
