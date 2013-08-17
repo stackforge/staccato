@@ -170,7 +170,8 @@ class TestApiNoSchedulerBasicFunctions(base.ApiTestBase):
         data = json.dumps(data_json)
         headers = {'content-type': 'application/json'}
         path = "/v1/transfers/%s/action" % id
-        response, content =  http_client.request(path, 'POST', headers=headers, body=data)
+        response, content = http_client.request(
+            path, 'POST', headers=headers, body=data)
         self.assertEqual(response.status, 400)
 
     def test_create_url_options(self):

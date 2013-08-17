@@ -26,11 +26,6 @@ def _make_xfer_request():
 
 class TestDeserializer(utils.TempFileCleanupBaseTest):
 
-    def test_delete(self):
-        xd = v1_xfer.XferDeserializer()
-        results = xd.delete('{}')
-        self.assertEqual(results, {})
-
     def test_new_transfer_good_required(self):
         xd = v1_xfer.XferDeserializer()
         body_json = {"source_url": "file://", "destination_url": "file:///"}
@@ -68,15 +63,10 @@ class TestDeserializer(utils.TempFileCleanupBaseTest):
                           xd.newtransfer,
                           body)
 
-    def test_delete(self):
+    def test_default(self):
         xd = v1_xfer.XferDeserializer()
-        results = xd.delete('{}')
-        self.assertEqual(results, {})
-
-    def test_status(self):
-        xd = v1_xfer.XferDeserializer()
-        results = xd.status('{}')
-        self.assertEqual(results, {})
+        results = xd.default('{}')
+        self.assertEqual(results, {'body': {}})
 
     def test_xferaction(self):
         xd = v1_xfer.XferDeserializer()

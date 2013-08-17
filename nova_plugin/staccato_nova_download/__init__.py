@@ -125,6 +125,7 @@ class StaccatoTransfer(xfer_base.TransferBase):
             raise exception.ImageDownloadModuleError(
                 {'reason': msg, 'module': u'StaccatoTransfer'})
 
+
 def get_download_handler(**kwargs):
     return StaccatoTransfer()
 

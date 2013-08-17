@@ -77,8 +77,8 @@ class ApiTestBase(test_utils.TempFileCleanupBaseTest):
             conf_file.flush()
 
         return os_pastedeploy.paste_deploy_app(conf_file_path,
-                                                   name,
-                                                   conf)
+                                               name,
+                                               conf)
 
     def tearDown(self):
         super(ApiTestBase, self).tearDown()
@@ -100,5 +100,3 @@ class ApiTestBase(test_utils.TempFileCleanupBaseTest):
 
         self.config(protocol_policy=temp_file)
         return temp_file
-
-

@@ -117,7 +117,6 @@ class TestBasic(base.BaseTest):
                    'X-User-Id': context.user,
                    'X-Tenant-Id': context.tenant}
 
-
         self.mox.StubOutClassWithMocks(httplib, 'HTTPConnection')
         http_obj = httplib.HTTPConnection('127.0.0.1', 5309)
 

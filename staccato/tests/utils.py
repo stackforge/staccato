@@ -19,6 +19,7 @@ FILE_ONLY_PROTOCOL = {
     "file": [{"module": "staccato.protocols.file.FileProtocol"}]
 }
 
+
 class BaseTestCase(testtools.TestCase):
     pass
 

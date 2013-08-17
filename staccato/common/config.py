@@ -71,16 +71,22 @@ def _log_string_to_val(conf):
         val = logging.ERROR
     elif str_lvl == 'warn' or str_lvl == 'warning':
         val = logging.WARN
-    elif str_lvl == "DEBUG":
+    elif str_lvl == "DlEBUG":
         val = logging.DEBUG
     setattr(conf, 'log_level', val)
 
 
-def get_config_object(args=None, usage=None, default_config_files=None):
+def get_config_object_no_parse():
     conf = cfg.ConfigOpts()
     conf.register_opts(common_opts)
     conf.register_opts(bind_opts)
     conf.register_opts(paste_deploy_opts, group='paste_deploy')
+    return conf
+
+
+def parse_config_object(conf, args=None, usage=None,
+                        default_config_files=None,
+                        skip_global=False):
     conf(args=args,
          project='staccato',
          version=version.cached_version_string(),
@@ -89,12 +95,23 @@ def get_config_object(args=None, usage=None, default_config_files=None):
     _log_string_to_val(conf)
 
     # to make keystone client middleware work (massive bummer)
-    cfg.CONF(args=args,
-             project='staccato',
-             version=version.cached_version_string(),
-             usage=usage,
-             default_config_files=default_config_files)
+    if not skip_global:
+        cfg.CONF(args=args,
+                 project='staccato',
+                 version=version.cached_version_string(),
+                 usage=usage,
+                 default_config_files=default_config_files)
 
+    return conf
+
+
+def get_config_object(args=None, usage=None,
+                      default_config_files=None,
+                      skip_global=False):
+    conf = get_config_object_no_parse()
+    parse_config_object(conf, args=args, usage=usage,
+                        default_config_files=default_config_files,
+                        skip_global=skip_global)
     return conf
 
 

@@ -20,6 +20,7 @@ def fail(returncode, e):
 def main():
     try:
         conf = config.get_config_object()
+
         paste_file = conf.find_file(conf.paste_deploy.config_file)
         if conf.paste_deploy.flavor is None:
             flavor = 'staccato-api'

@@ -19,6 +19,7 @@ def fail(returncode, e):
 def main():
     try:
         conf = config.get_config_object()
+
         sched = scheduler.get_scheduler(conf)
         sched.start()
         sched.wait()
