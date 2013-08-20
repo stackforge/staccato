@@ -34,3 +34,7 @@ def main():
         server.wait()
     except RuntimeError as e:
         fail(1, e)
+
+
+if __name__ == '__main__':
+    main()

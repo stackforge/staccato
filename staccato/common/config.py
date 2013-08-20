@@ -71,7 +71,7 @@ def _log_string_to_val(conf):
         val = logging.ERROR
     elif str_lvl == 'warn' or str_lvl == 'warning':
         val = logging.WARN
-    elif str_lvl == "DlEBUG":
+    elif str_lvl == "DEBUG":
         val = logging.DEBUG
     setattr(conf, 'log_level', val)
 
@@ -109,9 +109,9 @@ def get_config_object(args=None, usage=None,
                       default_config_files=None,
                       skip_global=False):
     conf = get_config_object_no_parse()
-    parse_config_object(conf, args=args, usage=usage,
-                        default_config_files=default_config_files,
-                        skip_global=skip_global)
+    conf = parse_config_object(conf, args=args, usage=usage,
+                               default_config_files=default_config_files,
+                               skip_global=skip_global)
     return conf
 
 

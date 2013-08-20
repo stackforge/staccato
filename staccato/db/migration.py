@@ -36,7 +36,7 @@ def upgrade(CONF, version=None):
     :param version: version to upgrade (defaults to latest)
     :retval version number
     """
-    db_version()  # Ensure db is under migration control
+    db_version(CONF)  # Ensure db is under migration control
     repo_path = get_migrate_repo_path()
     sql_connection = CONF.sql_connection
     version_str = version or 'latest'
@@ -95,16 +95,16 @@ def db_sync(CONF, version=None, current_version=None):
     """
     sql_connection = CONF.sql_connection
     try:
-        _version_control(current_version or 0)
+        _version_control(CONF, current_version or 0)
     except versioning_exceptions.DatabaseAlreadyControlledError, e:
         pass
 
     if current_version is None:
-        current_version = int(db_version())
+        current_version = int(db_version(CONF))
     if version is not None and int(version) < current_version:
-        downgrade(version=version)
+        downgrade(CONF, version=version)
     elif version is None or int(version) > current_version:
-        upgrade(version=version)
+        upgrade(CONF, version=version)
 
 
 def get_migrate_repo_path():
