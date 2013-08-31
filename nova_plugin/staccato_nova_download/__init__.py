@@ -91,13 +91,12 @@ class StaccatoTransfer(xfer_base.TransferBase):
                 raise exception.ImageDownloadModuleError(
                     {'reason': msg, 'module': unicode(self)})
 
-    def download(self, url_parts, dst_file, metadata, **kwargs):
+    def download(self, context, url_parts, dst_file, metadata, **kwargs):
         LOG.debug((_('Attemption to use %(module)s to download %(url)s')) %
                   {'module': unicode(self), 'url': url_parts.geturl()})
 
         headers = {'Content-Type': 'application/json'}
         if CONF.auth_strategy == 'keystone':
-            context = kwargs['context']
             headers['X-Auth-Token'] = getattr(context, 'auth_token', None)
             headers['X-User-Id'] = getattr(context, 'user', None)
             headers['X-Tenant-Id'] = getattr(context, 'tenant', None)
