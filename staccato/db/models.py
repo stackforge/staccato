@@ -45,6 +45,8 @@ class XferRequest(BASE, ModelBase):
     # TODO add protocol specific json documents
     source_opts = Column(PickleType())
     dest_opts = Column(PickleType())
+    executor_uuid = Column(String(512), nullable=True)
+
 
 
 def register_models(engine):
