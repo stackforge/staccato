@@ -17,10 +17,11 @@ class VersionApp(object):
     def __call__(self, req):
         version_info = {'id': self.conf.service_id,
                         'version': self.conf.version,
-                        'status': 'active'}
+                        'status': 'active',
+                        }
         protocols = config.get_protocol_policy(self.conf).keys()
         version_info['protocols'] = protocols
-        version_objs = [version_info]
+        version_objs = {'v1': version_info}
 
         response = webob.Response(request=req,
                                   status=httplib.MULTIPLE_CHOICES,

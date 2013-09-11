@@ -78,21 +78,21 @@ class StaccatoTransfer(xfer_base.TransferBase):
 
             body = response.read()
             response_dict = json.loads(body)
-            if response_dict['status'] == 'STATE_COMPLETE':
+            if response_dict['state'] == 'STATE_COMPLETE':
                 break
 
-            if response_dict['status'] in error_states:
+            if response_dict['state'] in error_states:
                 try:
                     self._delete(xfer_id, headers)
                 except Exception as ex:
                     LOG.error(ex)
                 msg = (_('The transfer could not be completed in state %s')
-                       % response_dict['status'])
+                       % response_dict['state'])
                 raise exception.ImageDownloadModuleError(
                     {'reason': msg, 'module': unicode(self)})
 
     def download(self, context, url_parts, dst_file, metadata, **kwargs):
-        LOG.debug((_('Attemption to use %(module)s to download %(url)s')) %
+        LOG.info((_('Attemption to use %(module)s to download %(url)s')) %
                   {'module': unicode(self), 'url': url_parts.geturl()})
 
         headers = {'Content-Type': 'application/json'}
@@ -105,10 +105,10 @@ class StaccatoTransfer(xfer_base.TransferBase):
                 'destination_url': 'file://%s' % dst_file}
         try:
             self.client.request('POST', '/v1/transfers',
-                                headers=headers, body=data)
+                                headers=headers, body=json.dumps(data))
             response = self.client.getresponse()
-            if response.status != 201:
-                msg = _('Error requesting a new transfer %s') % response.read()
+            if response.status != 200:
+                msg = _('Error requesting a new transfer %s.  Status = %d') % (response.read(), response.status)
                 LOG.error(msg)
                 raise exception.ImageDownloadModuleError(
                     {'reason': msg, 'module': unicode(self)})
@@ -120,25 +120,40 @@ class StaccatoTransfer(xfer_base.TransferBase):
             raise
         except Exception as ex:
             msg = unicode(ex.message)
-            LOG.error(msg)
+            LOG.exception(ex)
             raise exception.ImageDownloadModuleError(
                 {'reason': msg, 'module': u'StaccatoTransfer'})
 
 
-def get_download_handler(**kwargs):
+def get_download_hander(**kwargs):
     return StaccatoTransfer()
 
 
 def get_schemes():
     conf_group = CONF['staccato_nova_download_module']
     try:
+        LOG.info("Staccato get_schemes(): %s:%s" % (conf_group.hostname, conf_group.port))
         client = httplib.HTTPConnection(conf_group.hostname, conf_group.port)
-        response = client.request('GET', '/')
+        client.request('GET', '/')
+        response = client.getresponse()
         body = response.read()
-        version_json = json.loads(body)
+        LOG.info("Staccato version info %s" % body)
+        json_body = json.loads(body)
+        version_json = json_body['versions']
+        if 'v1' not in version_json:
+            reason = 'The staccato service does not support v1'
+            LOG.error(reason)
+            raise exception.ImageDownloadModuleError({'reason': reason,
+                                                      'module': u'staccato'})
+
+        version_json = version_json['v1']
+        LOG.info("Staccato offers %s" % str(version_json))
         return version_json['protocols']
     except Exception as ex:
-        reason = unicode(ex.message)
+        LOG.exception(ex)
+        reason = str(ex)
         LOG.error(reason)
-        raise exception.ImageDownloadModuleError({'reason': reason,
-                                                  'module': u'staccato'})
+        return []
+#NOTE(jbresnah) nova doesn't properly handle this yet
+#        raise exception.ImageDownloadModuleError({'reason': reason,
+#                                                  'module': u'staccato'})
