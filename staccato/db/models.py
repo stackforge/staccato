@@ -48,7 +48,6 @@ class XferRequest(BASE, ModelBase):
     executor_uuid = Column(String(512), nullable=True)
 
 
-
 def register_models(engine):
     models = (XferRequest,)
     for model in models:

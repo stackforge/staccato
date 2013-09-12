@@ -93,7 +93,7 @@ class StaccatoTransfer(xfer_base.TransferBase):
 
     def download(self, context, url_parts, dst_file, metadata, **kwargs):
         LOG.info((_('Attemption to use %(module)s to download %(url)s')) %
-                  {'module': unicode(self), 'url': url_parts.geturl()})
+                 {'module': unicode(self), 'url': url_parts.geturl()})
 
         headers = {'Content-Type': 'application/json'}
         if CONF.auth_strategy == 'keystone':
@@ -108,7 +108,8 @@ class StaccatoTransfer(xfer_base.TransferBase):
                                 headers=headers, body=json.dumps(data))
             response = self.client.getresponse()
             if response.status != 200:
-                msg = _('Error requesting a new transfer %s.  Status = %d') % (response.read(), response.status)
+                msg = (_('Error requesting a new transfer %s.  Status = %d') %
+                       (response.read(), response.status))
                 LOG.error(msg)
                 raise exception.ImageDownloadModuleError(
                     {'reason': msg, 'module': unicode(self)})
@@ -132,7 +133,8 @@ def get_download_hander(**kwargs):
 def get_schemes():
     conf_group = CONF['staccato_nova_download_module']
     try:
-        LOG.info("Staccato get_schemes(): %s:%s" % (conf_group.hostname, conf_group.port))
+        LOG.info(("Staccato get_schemes(): %s:%s" %
+                  (conf_group.hostname, conf_group.port)))
         client = httplib.HTTPConnection(conf_group.hostname, conf_group.port)
         client.request('GET', '/')
         response = client.getresponse()
