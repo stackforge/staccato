@@ -3,6 +3,7 @@ import gettext
 import sys
 
 from staccato.common import config
+import staccato.openstack.common.log as log
 import staccato.scheduler.interface as scheduler
 
 # Monkey patch socket and time
@@ -19,6 +20,7 @@ def fail(returncode, e):
 def main():
     try:
         conf = config.get_config_object()
+        log.setup('staccato')
 
         sched = scheduler.get_scheduler(conf)
         sched.start()

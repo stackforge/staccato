@@ -3,6 +3,7 @@ import gettext
 import sys
 
 from staccato.common import config
+import staccato.openstack.common.log as log
 import staccato.openstack.common.wsgi as os_wsgi
 import staccato.openstack.common.pastedeploy as os_pastedeploy
 
@@ -26,6 +27,8 @@ def main():
             flavor = 'staccato-api'
         else:
             flavor = 'staccato-api-' + conf.paste_deploy.flavor
+
+        log.setup('staccato')
         wsgi_app = os_pastedeploy.paste_deploy_app(paste_file,
                                                    flavor,
                                                    conf)

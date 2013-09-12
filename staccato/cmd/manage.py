@@ -6,6 +6,7 @@ import sys
 from oslo.config import cfg
 
 from staccato.common import config
+import staccato.openstack.common.log as log
 import staccato.db
 import staccato.db.migration
 
@@ -67,6 +68,7 @@ def main():
     conf.register_cli_opt(command_opt)
     conf = config.parse_config_object(conf, skip_global=False)
 
+    log.setup('staccato')
     conf.command.func(conf)
 
 
