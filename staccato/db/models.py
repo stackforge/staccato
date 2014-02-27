@@ -2,6 +2,8 @@
 SQLAlchemy models for staccato data
 """
 
+import uuid
+
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Integer
@@ -10,7 +12,6 @@ from sqlalchemy import String
 from sqlalchemy.ext.declarative import declarative_base
 
 from staccato.openstack.common import timeutils
-from staccato.openstack.common import uuidutils
 
 
 BASE = declarative_base()
@@ -32,7 +33,8 @@ class ModelBase(object):
 class XferRequest(BASE, ModelBase):
     __tablename__ = 'xfer_requests'
 
-    id = Column(String(36), primary_key=True, default=uuidutils.generate_uuid)
+    id = Column(String(36), primary_key=True,
+                default=lambda: str(uuid.uuid4()))
     srcurl = Column(String(2048), nullable=False)
     dsturl = Column(String(2048), nullable=False)
     owner = Column(String(128), nullable=False)
