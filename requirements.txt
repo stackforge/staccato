@@ -37,3 +37,4 @@ passlib
 jsonschema
 python-keystoneclient>=0.2.0
 pyOpenSSL
+six>=1.7.0
