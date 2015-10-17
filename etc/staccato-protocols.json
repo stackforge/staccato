@@ -1,4 +1,0 @@
-{
-    "file": [{"module": "staccato.protocols.file.FileProtocol"}],
-    "http": [{"module": "staccato.protocols.http.HttpProtocol"}]
-}
